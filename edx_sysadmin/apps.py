@@ -3,9 +3,6 @@ edx_sysadmin Django application initialization.
 """
 from django.apps import AppConfig
 
-from edx_django_utils.plugins import PluginURLs
-
-from openedx.core.djangoapps.plugins.constants import ProjectType
 
 class EdxSysAdminConfig(AppConfig):
     """
@@ -16,11 +13,10 @@ class EdxSysAdminConfig(AppConfig):
     verbose_name = "Open edX SysAdmin"
 
     plugin_app = {
-        PluginURLs.CONFIG: {
-            ProjectType.LMS: {
-                PluginURLs.NAMESPACE: 'sysadmin',
-                PluginURLs.APP_NAME: 'sysadmin',
-                PluginURLs.REGEX: r'^sysadmin/',
+        "url_config": {
+            "lms.djangoapp": {
+                "namespace": "sysadmin",
+                "regex": "^sysadmin/",
             }
         },
     }

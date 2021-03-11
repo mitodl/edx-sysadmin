@@ -11,11 +11,6 @@ from edx_sysadmin.views import (
 app_name = "sysadmin"
 
 
-
 urlpatterns = [
-    re_path(
-        r"",
-        IndexPage.as_view(),
-        name="index_page"
-    ),
+    re_path(r"", IndexPage.as_view(), name="index_page"),
 ]
