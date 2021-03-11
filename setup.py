@@ -68,9 +68,8 @@ setup(
     name='edx-sysadmin',
     version=VERSION,
     description="""An Open edX plugin to enable SysAdmin panel""",
-    long_description=README + '\n\n' + CHANGELOG,
-    author='edX',
-    author_email='oscm@edx.org',
+    long_description=README,
+    author="MIT Office of Digital Learning",
     url='https://github.com/edx/edx-sysadmin',
     packages=[
         'edx_sysadmin',
@@ -91,4 +90,11 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.8',
     ],
+    entry_points={
+        "lms.djangoapp": [
+            "edx_sysadmin = edx_sysadmin.apps:EdxSysAdminConfig",
+        ],
+        "cms.djangoapp": [
+        ],
+    }
 )
