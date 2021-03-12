@@ -12,7 +12,6 @@ from setuptools import setup
 def get_version(*file_paths):
     """
     Extract the version string from the file.
-
     Input:
      - file_paths: relative path fragments to file with
                    version string
@@ -28,7 +27,6 @@ def get_version(*file_paths):
 def load_requirements(*requirements_paths):
     """
     Load all requirements from the specified requirements files.
-
     Returns:
         list: Requirements file relative path strings
     """
@@ -45,7 +43,6 @@ def load_requirements(*requirements_paths):
 def is_requirement(line):
     """
     Return True if the requirement line is a package requirement.
-
     Returns:
         bool: True if the line is not blank, a comment, a URL, or
               an included file
@@ -62,7 +59,6 @@ if sys.argv[-1] == "tag":
     sys.exit()
 
 README = open(os.path.join(os.path.dirname(__file__), "README.rst")).read()
-CHANGELOG = open(os.path.join(os.path.dirname(__file__), "CHANGELOG.rst")).read()
 
 setup(
     name="edx-sysadmin",
