@@ -1,39 +1,35 @@
-**Description:** Describe in a couple of sentences what this PR adds
+#### Pre-Flight checklist
 
-**JIRA:** Link to JIRA ticket
+- [ ] Screenshots and design review for any changes that affect layout or styling
+  - [ ] Desktop screenshots
+  - [ ] Mobile width screenshots
+  - [ ] Tag @ferdi or @pdpinch for review
+- [ ] Migrations
+  - [ ] Migration is backwards-compatible with current production code
+- [ ] Testing
+  - [ ] Code is tested
+  - [ ] Changes have been manually tested
+- [ ] Settings
+  - [ ] New settings are documented and present in `app.json`
+  - [ ] New settings have reasonable development defaults, if applicable
 
-**Dependencies:** dependencies on other outstanding PRs, issues, etc. 
+#### What are the relevant tickets?
+(Required)
 
-**Merge deadline:** List merge deadline (if any)
+#### What's this PR do?
+(Required)
 
-**Installation instructions:** List any non-trivial installation 
-instructions.
+#### How should this be manually tested?
+(Required)
 
-**Testing instructions:**
+#### Where should the reviewer start?
+(Optional)
 
-1. Open page A
-2. Do thing B
-3. Expect C to happen
-4. If D happened instead - check failed.
+#### Any background context you want to provide?
+(Optional)
 
-**Reviewers:**
-- [ ] tag reviewer 
-- [ ] tag reviewer 
+#### Screenshots (if appropriate)
+(Optional)
 
-**Merge checklist:**
-- [ ] All reviewers approved
-- [ ] CI build is green
-- [ ] Version bumped
-- [ ] Changelog record added
-- [ ] Documentation updated (not only docstrings)
-- [ ] Commits are squashed
-
-**Post merge:**
-- [ ] Create a tag
-- [ ] Check new version is pushed to PyPI after tag-triggered build is 
-      finished.
-- [ ] Delete working branch (if not needed anymore)
-
-**Author concerns:** List any concerns about this PR - inelegant 
-solutions, hacks, quick-and-dirty implementations, concerns about 
-migrations, etc.
+#### What GIF best describes this PR or how it makes you feel?
+(Optional)
