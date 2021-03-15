@@ -3,9 +3,7 @@ URLs for edx_sysadmin.
 """
 from django.conf.urls import url
 
-from edx_sysadmin.views import (
-    IndexPage,
-)
+from edx_sysadmin.views import IndexPage
 
 app_name = "sysadmin"
 
