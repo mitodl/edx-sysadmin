@@ -2,9 +2,9 @@
 Views for the Open edX SysAdmin Plugin
 """
 
-from django.views.generic.base import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
+from django.shortcuts import render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.html import escape
@@ -14,12 +14,12 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import condition
 from django.views.generic.base import TemplateView
 from opaque_keys.edx.keys import CourseKey
-from django.shortcuts import render
-from .utils.markup import HTML
 from six import StringIO, text_type
-from .utils.utility import get_course_by_id
 
 from xmodule.modulestore.django import modulestore
+
+from .utils.markup import HTML
+from .utils.utility import get_course_by_id
 
 
 class SysadminDashboardView(TemplateView):

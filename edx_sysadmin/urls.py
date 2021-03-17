@@ -3,7 +3,7 @@ URLs for edx_sysadmin.
 """
 from django.conf.urls import url
 
-from edx_sysadmin.views import SysadminDashboardView, Courses
+from edx_sysadmin.views import Courses, SysadminDashboardView
 
 app_name = "sysadmin"
 
