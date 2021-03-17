@@ -34,22 +34,15 @@ class SysadminDashboardView(TemplateView):
         """
 
         self.def_ms = modulestore()
-        self.msg = u''
-        self.datatable = []
+        self.msg = u""
         super(SysadminDashboardView, self).__init__(**kwargs)
 
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(login_required)
-    @method_decorator(cache_control(no_cache=True, no_store=True,
-                                    must_revalidate=True))
+    @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
     @method_decorator(condition(etag_func=None))
     def dispatch(self, *args, **kwargs):
         return super(SysadminDashboardView, self).dispatch(*args, **kwargs)
- 
-    def get_courses(self):
-        """ Get an iterable list of courses."""
-
-        return self.def_ms.get_courses()
 
 
 class Courses(SysadminDashboardView):
@@ -74,37 +67,33 @@ class Courses(SysadminDashboardView):
         if not request.user.is_staff:
             raise Http404
 
-        action = request.POST.get('action', '')
-        courses = {course.id: course for course in self.get_courses()}
-        if action == 'del_course':
-            course_id = request.POST.get('course_id', '').strip()
+        action = request.POST.get("action", "")
+        if action == "del_course":
+            course_id = request.POST.get("course_id", "").strip()
             course_key = CourseKey.from_string(course_id)
             course_found = False
-            if course_key in courses:
+            try:
+                course = get_course_by_id(course_key)
                 course_found = True
-                course = courses[course_key]
-            else:
-                try:
-                    course = get_course_by_id(course_key)
-                    course_found = True
-                except Exception as err:   # pylint: disable=broad-except
-                    self.msg += _(
-                        HTML(u'<div class="error">Error - cannot get course with ID {0}<br/><pre>{1}</pre></div>')
-                    ).format(
-                        course_key,
-                        escape(str(err))
+            except Exception as err:  # pylint: disable=broad-except
+                self.msg += _(
+                    HTML(
+                        u'<div class="error">Error - cannot get course with ID {0}<br/><pre>{1}</pre></div>'
                     )
+                ).format(course_key, escape(str(err)))
 
             if course_found:
                 # delete course that is stored with mongodb backend
                 self.def_ms.delete_course(course.id, request.user.id)
                 # don't delete user permission groups, though
-                self.msg += \
-                    HTML(u"<font class='success'>{0} {1} = {2} ({3})</font>").format(
-                        _('Deleted'), text_type(course.location), text_type(course.id), course.display_name)
-        
-        context = {
-            'msg': self.msg
-        }
-        return render(request, self.template_name, context)
+                self.msg += HTML(
+                    u"<font class='success'>{0} {1} = {2} ({3})</font>"
+                ).format(
+                    _("Deleted"),
+                    text_type(course.location),
+                    text_type(course.id),
+                    course.display_name,
+                )
 
+        context = {"msg": self.msg}
+        return render(request, self.template_name, context)
