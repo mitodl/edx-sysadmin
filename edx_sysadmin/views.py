@@ -75,7 +75,7 @@ class Courses(SysadminDashboardView):
                 course = get_course_by_id(course_key)
                 course_found = True
             except Exception as err:  # pylint: disable=broad-except, translation-of-non-string
-                self.msg += _(
+                self.msg += _(  # pylint: disable=translation-of-non-string
                     HTML(
                         u'<div class="error">Error - cannot get course with ID {0}<br/><pre>{1}</pre></div>'
                     )
