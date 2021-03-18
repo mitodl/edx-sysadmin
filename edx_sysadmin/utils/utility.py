@@ -17,7 +17,7 @@ from xmodule.modulestore.django import modulestore
 
 from edx_sysadmin.utils.markup import HTML
 
-from openedx.core.djangoapps.user_authn.toggles import (  # isort:skip
+from openedx.core.djangoapps.user_authn.toggles import (
     is_require_third_party_auth_enabled,
 )
 
@@ -83,8 +83,8 @@ def get_registeration_required_extra_fields_with_values():
 
     """
     # importing here due to circular import
-    from edx_sysadmin.constants import (  # pylint: disable=import-outside-toplevel; isort:skip
-    FIELDS_AND_DEFAULT_VALUES_MAP,
+    from edx_sysadmin.constants import (  # pylint: disable=import-outside-toplevel
+        FIELDS_AND_DEFAULT_VALUES_MAP,
     )
 
     extra_fields = {}
