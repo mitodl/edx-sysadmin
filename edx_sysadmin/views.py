@@ -15,7 +15,6 @@ from django.views.decorators.http import condition
 from django.views.generic.base import TemplateView
 from opaque_keys.edx.keys import CourseKey
 from six import StringIO, text_type
-
 from xmodule.modulestore.django import modulestore
 
 from .utils.markup import HTML

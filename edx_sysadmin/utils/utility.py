@@ -4,7 +4,6 @@ Utility function defined here.
 
 import six
 from django.http import Http404
-
 from xmodule.modulestore.django import modulestore
 
 
