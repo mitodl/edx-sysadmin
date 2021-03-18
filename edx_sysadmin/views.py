@@ -1,11 +1,10 @@
+# pylint: disable=import-error, arguments-differ
 """
 Views for the Open edX SysAdmin Plugin
 """
 
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponse
 from django.shortcuts import render
-from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
@@ -14,7 +13,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import condition
 from django.views.generic.base import TemplateView
 from opaque_keys.edx.keys import CourseKey
-from six import StringIO, text_type
+from six import text_type
 from xmodule.modulestore.django import modulestore
 
 from .utils.markup import HTML
@@ -34,14 +33,14 @@ class SysadminDashboardView(TemplateView):
 
         self.def_ms = modulestore()
         self.msg = u""
-        super(SysadminDashboardView, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(login_required)
     @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
     @method_decorator(condition(etag_func=None))
     def dispatch(self, *args, **kwargs):
-        return super(SysadminDashboardView, self).dispatch(*args, **kwargs)
+        return super().dispatch(*args, **kwargs)
 
 
 class Courses(SysadminDashboardView):
@@ -74,7 +73,7 @@ class Courses(SysadminDashboardView):
             try:
                 course = get_course_by_id(course_key)
                 course_found = True
-            except Exception as err:  # pylint: disable=broad-except
+            except Exception as err:  # pylint: disable=broad-except, translation-of-non-string
                 self.msg += _(
                     HTML(
                         u'<div class="error">Error - cannot get course with ID {0}<br/><pre>{1}</pre></div>'
