@@ -6,20 +6,21 @@ import json
 
 import requests
 import six
-from common.djangoapps.student.models import UserProfile
-from common.djangoapps.util.password_policy_validators import normalize_password
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.http import Http404
 from django.urls import reverse
 from django_countries import countries
-from xmodule.modulestore.django import modulestore
 
-from edx_sysadmin.utils.markup import HTML
-
+from common.djangoapps.student.models import UserProfile
+from common.djangoapps.util.password_policy_validators import normalize_password
 from openedx.core.djangoapps.user_authn.toggles import (
     is_require_third_party_auth_enabled,
 )
+from xmodule.modulestore.django import modulestore
+
+from edx_sysadmin.utils.markup import HTML
 
 
 User = get_user_model()
@@ -60,7 +61,7 @@ def get_registration_required_extra_fields():
     return extra_fields
 
 
-def get_registeration_required_extra_fields_with_values():
+def get_registration_required_extra_fields_with_values():
     """
     It maps registration required extra fields with some pre-defined default values to create
     django form fields dynamically
@@ -83,7 +84,7 @@ def get_registeration_required_extra_fields_with_values():
 
     """
     # importing here due to circular import
-    from edx_sysadmin.constants import (  # pylint: disable=import-outside-toplevel
+    from edx_sysadmin.constants import (  # pylint: disable=import-outside-toplevel,cyclic-import
         FIELDS_AND_DEFAULT_VALUES_MAP,
     )
 
@@ -238,8 +239,9 @@ def get_level_of_education_choices():
     List of "Level of Education" choices provided by UserProfile
     """
     return [
-        (name, label) for name, label in UserProfile.LEVEL_OF_EDUCATION_CHOICES
-    ]  # pylint: disable=unnecessary-comprehension
+        (name, label)
+        for name, label in UserProfile.LEVEL_OF_EDUCATION_CHOICES  # pylint: disable=unnecessary-comprehension
+    ]
 
 
 def get_gender_choices():
@@ -247,8 +249,9 @@ def get_gender_choices():
     List of "Gender" choices provided by UserProfile
     """
     return [
-        (name, label) for name, label in UserProfile.GENDER_CHOICES
-    ]  # pylint: disable=unnecessary-comprehension
+        (name, label)
+        for name, label in UserProfile.GENDER_CHOICES  # pylint: disable=unnecessary-comprehension
+    ]
 
 
 def get_valid_year_of_birth_choices():

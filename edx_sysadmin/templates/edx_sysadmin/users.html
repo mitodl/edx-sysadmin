@@ -4,7 +4,9 @@
 
 {% block panel %}
     {% if disclaimer %}
-		<div class="disclaimer">{{ disclaimer }}</div>
+		<div class="disclaimer">
+            <b>Disclaimer</b>: Account Registration API is not function in your platform, User Account will be created through DB Models
+        </div>
         <hr>
     {% endif %}
     <h3>{% trans "Register Users" %}</h3><br/>

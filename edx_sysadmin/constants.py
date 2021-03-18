@@ -12,10 +12,6 @@ from edx_sysadmin.utils.utility import (
     get_valid_year_of_birth_choices,
 )
 
-REGISTRATION_API_BLOCKED_DISCLAIMER = HTML(
-    "<b>Disclaimer</b>: Account Registration API is not function in your platform, "
-    "User Account will be created through DB Models"
-)
 
 FIELDS_AND_DEFAULT_VALUES_MAP = {
     # Pattern of Fields Mapping

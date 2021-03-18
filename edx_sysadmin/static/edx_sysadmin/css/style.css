@@ -71,14 +71,14 @@ textarea {
 .error_message {
 	background-color: #FFBABA;
 	border-radius: 10px;
-    color: black;
+	color: black;
 	margin-bottom: 20px;
 	margin-top: 10px;
 	padding: 20px;
 }
 
 .success_message {
-    background-color: #DFF2BF;
+	background-color: #DFF2BF;
 	border-radius: 10px;
 	color: black;
 	margin-bottom: 20px;
@@ -88,9 +88,9 @@ textarea {
 
 .form-user-registration {
 	margin-left: 20px;
-    margin-top: 10px;
-    margin-right: 10px;
-    margin-bottom: 20px;
+	margin-top: 10px;
+	margin-right: 10px;
+	margin-bottom: 20px;
 }
 
 .instructor-nav a {

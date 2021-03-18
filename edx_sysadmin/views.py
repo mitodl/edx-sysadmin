@@ -16,13 +16,12 @@ from opaque_keys.edx.keys import CourseKey
 from six import text_type
 from xmodule.modulestore.django import modulestore
 
-from edx_sysadmin.constants import REGISTRATION_API_BLOCKED_DISCLAIMER
 from edx_sysadmin.forms import UserRegistrationForm
 from edx_sysadmin.utils.markup import HTML
 from edx_sysadmin.utils.utility import (
     create_user_account,
     get_course_by_id,
-    get_registeration_required_extra_fields_with_values,
+    get_registration_required_extra_fields_with_values,
     is_registration_api_functional,
 )
 
@@ -102,10 +101,10 @@ class UsersPanel(SysadminDashboardView):
         """
         context = super().get_context_data(**kwargs)
         initial_data = kwargs.pop("initial_data", None)
-        extra_fields = get_registeration_required_extra_fields_with_values()
+        extra_fields = get_registration_required_extra_fields_with_values()
 
         if not is_registration_api_functional():
-            context["disclaimer"] = REGISTRATION_API_BLOCKED_DISCLAIMER
+            context["disclaimer"] = True
 
         context["user_registration_form"] = UserRegistrationForm(
             initial_data, extra_fields=extra_fields
@@ -116,7 +115,7 @@ class UsersPanel(SysadminDashboardView):
         """
         POST method for User registration
         """
-        extra_fields = get_registeration_required_extra_fields_with_values()
+        extra_fields = get_registration_required_extra_fields_with_values()
         form = UserRegistrationForm(request.POST, extra_fields=extra_fields)
         context = self.get_context_data(initial_data=request.POST, **kwargs)
 
