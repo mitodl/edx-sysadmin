@@ -1,8 +1,24 @@
 {% extends "main_django.html" %}
 {% load i18n static %}
 
+<link rel="stylesheet" href="{% static 'edx_sysadmin/css/style.css' %}">
+
 {% block body %}
-<h1>
-    THIS IS THE INDEX PAGE
-</h1>
+<section class="container">
+    <div class="sysadmin-dashboard-wrapper">
+        <section class="sysadmin-dashboard-content">
+            <h1 class="main-heading">{% trans "Sysadmin Dashboard" %}</h1>
+            <hr />
+            <h2 class="instructor-nav">
+                <a href="#">{% trans "Users" %}</a>
+                <a href="{% url 'sysadmin:sysadmin_courses' %}"> {% trans "Courses" %} </a>
+            </h2>
+            <hr />
+            {% block course %}
+            {% endblock course %}
+        </section>
+        {% block msg %}
+        {% endblock msg %}
+    </div>
+</section>
 {% endblock body %}
