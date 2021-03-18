@@ -2,8 +2,14 @@
 """
 Views for the Open edX SysAdmin Plugin
 """
+import logging
+import mongoengine
 
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.http import Http404
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.utils.html import escape
@@ -13,10 +19,12 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import condition
 from django.views.generic.base import TemplateView
 
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 
 from edx_sysadmin.forms import UserRegistrationForm
+from edx_sysadmin.models import CourseImportLog
 from edx_sysadmin.utils.markup import HTML, Text
 from edx_sysadmin.utils.utils import (
     create_user_account,
@@ -24,6 +32,8 @@ from edx_sysadmin.utils.utils import (
     get_registration_required_extra_fields_with_values,
     is_registration_api_functional,
 )
+
+log = logging.getLogger(__name__)
 
 
 @method_decorator(ensure_csrf_cookie, name="dispatch")
@@ -137,5 +147,89 @@ class UsersPanel(SysadminDashboardView):
             context["error_message"] = _(
                 "Unable to create new account due to invalid data"
             )
+
+
+class GitLogs(SysadminDashboardView):
+    """
+    This provides a view into the import of courses from git repositories.
+    It is convenient for allowing course teams to see what may be wrong with
+    their xml
+    """
+
+    template_name = 'edx_sysadmin/gitlogs.html'
+
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        """Shows logs of imports that happened as a result of a git import"""
+
+        course_id = kwargs.get('course_id')
+        if course_id:
+            course_id = CourseKey.from_string(course_id)
+
+        page_size = 10
+
+        # Set mongodb defaults even if it isn't defined in settings
+        mongo_db = {
+            'host': 'localhost',
+            'user': '',
+            'password': '',
+            'db': 'xlog',
+        }
+
+        # Allow overrides
+        if hasattr(settings, 'MONGODB_LOG'):
+            for config_item in ['host', 'user', 'password', 'db', ]:
+                mongo_db[config_item] = settings.MONGODB_LOG.get(
+                    config_item, mongo_db[config_item])
+
+        mongouri = 'mongodb://{user}:{password}@{host}/{db}'.format(**mongo_db)
+
+        error_msg = ''
+
+        try:
+            if mongo_db['user'] and mongo_db['password']:
+                mdb = mongoengine.connect(mongo_db['db'], host=mongouri)
+            else:
+                mdb = mongoengine.connect(mongo_db['db'], host=mongo_db['host'])
+        except mongoengine.connection.ConnectionError:
+            log.exception('Unable to connect to mongodb to save log, '
+                          'please check MONGODB_LOG settings.')
+
+        if course_id is None:
+            # Require staff if not going to specific course
+            if not request.user.is_staff:
+                raise Http404
+            cilset = CourseImportLog.objects.order_by('-created')
+        else:
+            # Allow only course team, instructors, and staff
+            if not (request.user.is_staff or
+                    CourseInstructorRole(course_id).has_user(request.user) or
+                    CourseStaffRole(course_id).has_user(request.user)):
+                raise Http404
+            log.debug('course_id=%s', course_id)
+            cilset = CourseImportLog.objects.filter(
+                course_id=course_id
+            ).order_by('-created')
+            log.debug(u'cilset length=%s', len(cilset))
+
+        # Paginate the query set
+        paginator = Paginator(cilset, page_size)
+        try:
+            logs = paginator.page(request.GET.get('page'))
+        except PageNotAnInteger:
+            logs = paginator.page(1)
+        except EmptyPage:
+            # If the page is too high or low
+            given_page = int(request.GET.get('page'))
+            page = min(max(1, given_page), paginator.num_pages)
+            logs = paginator.page(page)
+
+        mdb.close()
+        context = {
+            'logs': logs,
+            'course_id': text_type(course_id) if course_id else None,
+            'error_msg': error_msg,
+            'page_size': page_size
+        }
 
         return render(request, self.template_name, context)

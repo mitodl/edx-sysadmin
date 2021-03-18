@@ -6,15 +6,15 @@ Sysadmin Stylesheet
     font-size: 30px;
 }
 
-.warning-alert h5{
-	color: red;
-	text-align: left;
-	text-decoration: underline;
-	margin-bottom: 10px;
+.warning-alert h5 {
+    color: red;
+    text-align: left;
+    text-decoration: underline;
+    margin-bottom: 10px;
 }
 
 a.active-section {
-	color: #551A8B;
+    color: #551a8b;
 }
 
 .sysadmin-dashboard-content {
@@ -28,36 +28,37 @@ sysadmin-dashboard-content h2 a {
     margin-right: 1.2em;
 }
 
-
 table.stat_table {
-	font-family: verdana,arial,sans-serif;
-	font-size:11px;
-	color:#333333;
-	border-width: 1px;
-	border-color: #666666;
-	border-collapse: collapse;
+    font-family: verdana, arial, sans-serif;
+    font-size: 11px;
+    color: #333333;
+    border-width: 1px;
+    border-color: #666666;
+    border-collapse: collapse;
 }
 
 table.stat_table th {
-	border-width: 1px;
-	padding: 8px;
-	border-style: solid;
-	border-color: #666666;
-	background-color: #dedede;
+    border-width: 1px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #666666;
+    background-color: #dedede;
 }
 
 table.stat_table td {
-	border-width: 1px;
-	padding: 8px;
-	border-style: solid;
-	border-color: #666666;
-	background-color: #ffffff;
+    border-width: 1px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #666666;
+    background-color: #ffffff;
 }
 
-a.selectedmode { background-color: yellow; }
+a.selectedmode {
+    background-color: yellow;
+}
 
 textarea {
-  height: 200px;
+    height: 200px;
 }
 
 .error {
@@ -106,4 +107,22 @@ textarea {
 .disclaimer span {
 	text-decoration: underline;
     font-style: italic;
+}
+
+.import-log {
+    display: none;
+}
+
+.pagination,
+.page-status {
+    text-align: center;
+    padding: 12px 0 12px 0;
+}
+
+.pagination .previous-page {
+    padding-right: 10px;
+}
+
+.pagination .next-page {
+    padding-left: 10px;
 }
