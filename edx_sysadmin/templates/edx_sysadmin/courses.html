@@ -2,7 +2,7 @@
 
 {% load i18n static %}
 
-{% block course %}
+{% block panel %}
     <h3>{% trans "Administer Courses" %}</h3><br/>
     <form name="action" method="POST">
         {% csrf_token %}
@@ -19,7 +19,7 @@
         </div>
     </form>
     <hr style="width:100%" />
-{% endblock course %}
+{% endblock panel %}
 {% block msg %}
 	{% if msg %}
 		<p>{{msg}}</p>
