@@ -2,9 +2,13 @@
 """
 Views for the Open edX SysAdmin Plugin
 """
+import json
 import logging
-import mongoengine
+import os
+import subprocess
+import warnings
 
+import mongoengine
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
@@ -18,11 +22,15 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import condition
 from django.views.generic.base import TemplateView
+from path import Path as path
+from io import StringIO
 
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 
+from edx_sysadmin.git_import import GitImportError
+from edx_sysadmin import git_import
 from edx_sysadmin.forms import UserRegistrationForm
 from edx_sysadmin.models import CourseImportLog
 from edx_sysadmin.utils.markup import HTML, Text
@@ -147,6 +155,118 @@ class UsersPanel(SysadminDashboardView):
             context["error_message"] = _(
                 "Unable to create new account due to invalid data"
             )
+
+
+class GitImport(SysadminDashboardView):
+    """
+    This provide the view to load new course from github
+    """
+    
+    template_name = 'edx_sysadmin/gitimport.html'
+
+    def git_info_for_course(self, cdir):
+        """This pulls out some git info like the last commit"""
+
+        cmd = ''
+        gdir = settings.DATA_DIR / cdir
+        info = ['', '', '']
+
+        # Try the data dir, then try to find it in the git import dir
+        if not gdir.exists():
+            git_repo_dir = getattr(settings, 'GIT_REPO_DIR', git_import.DEFAULT_GIT_REPO_DIR)
+            gdir = path(git_repo_dir) / cdir
+            if not gdir.exists():
+                return info
+
+        cmd = ['git', 'log', '-1',
+               u'--format=format:{ "commit": "%H", "author": "%an %ae", "date": "%ad"}', ]
+        try:
+            output_json = json.loads(subprocess.check_output(cmd, cwd=gdir).decode('utf-8'))
+            info = [output_json['commit'],
+                    output_json['date'],
+                    output_json['author'], ]
+        except OSError as error:
+            log.warning((u"Error fetching git data: %s - %s"), cdir, error)
+        except (ValueError, subprocess.CalledProcessError):
+            pass
+
+        return info
+
+    def get_course_from_git(self, gitloc, branch):
+        """This downloads and runs the checks for importing a course in git"""
+
+        if not (gitloc.endswith('.git') or gitloc.startswith('http:') or
+                gitloc.startswith('https:') or gitloc.startswith('git:')):
+            return _("The git repo location should end with '.git', "
+                     "and be a valid url")
+
+        return self.import_mongo_course(gitloc, branch)
+
+    def import_mongo_course(self, gitloc, branch):
+        """
+        Imports course using management command and captures logging output
+        at debug level for display in template
+        """
+
+        msg = u''
+
+        log.debug(u'Adding course using git repo %s', gitloc)
+
+        # Grab logging output for debugging imports
+        output = StringIO()
+        import_log_handler = logging.StreamHandler(output)
+        import_log_handler.setLevel(logging.DEBUG)
+
+        logger_names = ['xmodule.modulestore.xml_importer',
+                        'lms.djangoapps.dashboard.git_import',
+                        'xmodule.modulestore.xml',
+                        'xmodule.seq_module', ]
+        loggers = []
+
+        for logger_name in logger_names:
+            logger = logging.getLogger(logger_name)
+            logger.setLevel(logging.DEBUG)
+            logger.addHandler(import_log_handler)
+            loggers.append(logger)
+
+        error_msg = ''
+        try:
+            git_import.add_repo(gitloc, None, branch)
+        except GitImportError as ex:
+            error_msg = str(ex)
+        ret = output.getvalue()
+
+        # Remove handler hijacks
+        for logger in loggers:
+            logger.setLevel(logging.NOTSET)
+            logger.removeHandler(import_log_handler)
+
+        if error_msg:
+            msg_header = error_msg
+            color = 'red'
+        else:
+            msg_header = _('Added Course')
+            color = 'blue'
+
+        msg = HTML(u"<h4 style='color:{0}'>{1}</h4>").format(color, msg_header)
+        msg += HTML(u"<pre>{0}</pre>").format(escape(ret))
+        return msg
+
+    def post(self, request):
+        """Handle all actions from courses view"""
+
+        if not request.user.is_staff:
+            raise Http404
+
+        action = request.POST.get('action', '')
+
+        if action == 'add_course':
+            gitloc = request.POST.get('repo_location', '').strip().replace(' ', '').replace(';', '')
+            branch = request.POST.get('repo_branch', '').strip().replace(' ', '').replace(';', '')
+            self.msg += self.get_course_from_git(gitloc, branch)
+
+        context = {"msg": self.msg}
+        return render(request, self.template_name, context)
 
 
 class GitLogs(SysadminDashboardView):
