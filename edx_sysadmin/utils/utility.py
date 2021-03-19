@@ -3,15 +3,16 @@
 Utility function defined here.
 """
 import json
-
+import urllib.parse
 import requests
-import six
+
+from django_countries import countries
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.http import Http404
 from django.urls import reverse
-from django_countries import countries
+from django.utils.translation import ugettext as _
 
 from common.djangoapps.student.models import UserProfile
 from common.djangoapps.util.password_policy_validators import normalize_password
@@ -39,7 +40,7 @@ def get_course_by_id(course_key, depth=0):
     if course:
         return course
     else:
-        raise Http404("Course not found: {}.".format(six.text_type(course_key)))
+        raise Http404(f"{_('Course not found')}: {course_key}.")
 
 
 def get_registration_required_extra_fields():
@@ -119,7 +120,7 @@ def is_registration_api_functional():
     return False
 
 
-def create_user_account(data, build_absolute_uri, use_reg_api=True):
+def create_user_account(data, use_reg_api=True):
     """
     Create User Account through "/user_api/v1/account/registration/" API (if available)
     or directly through "User" and "UserProfile" models
@@ -127,9 +128,6 @@ def create_user_account(data, build_absolute_uri, use_reg_api=True):
     Arguments:
     data (dict) - the params to use while creating user account, it can have "username", "name",
         "email", "password" and many other registration related fields
-
-    build_absolute_uri (method|request.build_absolute_uri) - a request method to build
-        absolute uri
 
     use_reg_api (boolean) - used to specify which account creation flow should be followed
 
@@ -139,9 +137,7 @@ def create_user_account(data, build_absolute_uri, use_reg_api=True):
     """
     context = {}
     if is_registration_api_functional() and use_reg_api:
-        context = make_reg_api_request(
-            build_absolute_uri(reverse("user_api_registration")), data=data
-        )
+        context = make_reg_api_request(data=data)
     else:
         context = create_user_through_db_models(data)
 
@@ -172,28 +168,26 @@ def create_user_through_db_models(data):
             profile.save()
 
             context["success_message"] = HTML(
-                f"A new account has been registered for user: {data['username']}"
+                f"{_('A new account has been registered for user')}: {data['username']}"
             )
         else:
             context["error_message"] = HTML(
-                f"An account with email: {data['email']} already exists"
+                f"{_('An account already exists with email')}: {data['email']}"
             )
             return context
     except Exception as err:  # pylint: disable=broad-except
         context["error_message"] = HTML(
-            f"Account couldn't be created due to following error: {err}"
+            f"{_('Account could not be created due to following error')}: {err}"
         )
 
     return context
 
 
-def make_reg_api_request(api_endpoint, data):
+def make_reg_api_request(data):
     """
     Make POST request to "/user_api/v1/account/registration/" API to register User
 
     Arguments:
-    api_endpoint (url) - An absolute url to registration API
-
     data (dict) - User account details
 
     Returns:
@@ -202,18 +196,31 @@ def make_reg_api_request(api_endpoint, data):
     """
     context = {}
 
+    api_endpoint = urllib.parse.urljoin(
+        get_lms_base_url(), reverse("user_api_registration")
+    )
     resp = requests.post(api_endpoint, data=data)
 
     if resp.status_code == 200:
         context["success_message"] = HTML(
-            f"A new account has been registered through API for user: {data.get('username')}"
+            f"{_('A new account has been registered through API for user')}: {data.get('username')}"
         )
     else:
         context["error_message"] = HTML(
-            f"Account couldn't be created due to following error(s): {transform_error_message(resp.content)}"
+            f"{_('Account could not be created due to following error(s)')}: {transform_error_message(resp.content)}"
         )
 
     return context
+
+
+def get_lms_base_url():
+    """
+    It returns LMS base url of edx-platform
+
+    Returns:
+    url (str) - LMS base url
+    """
+    return settings.LMS_BASE
 
 
 def transform_error_message(resp_content):
@@ -229,8 +236,8 @@ def transform_error_message(resp_content):
     content = json.loads(resp_content.decode("utf-8").replace("\n", ""))
     message = ""
     for error_key, error_content in content.items():
-        if len(error_content):
-            message += f"<li>{error_key}: {error_content[0].get('user_message')}</li>"
+        if error_content:
+            message += f"<li>{error_key}: {_(error_content[0].get('user_message'))}</li>"  # pylint: disable=translation-of-non-string
     return f"<ul>{message}</ul>"
 
 
@@ -238,29 +245,21 @@ def get_level_of_education_choices():
     """
     List of "Level of Education" choices provided by UserProfile
     """
-    return [
-        (name, label)
-        for name, label in UserProfile.LEVEL_OF_EDUCATION_CHOICES  # pylint: disable=unnecessary-comprehension
-    ]
+    return list(UserProfile.LEVEL_OF_EDUCATION_CHOICES)
 
 
 def get_gender_choices():
     """
     List of "Gender" choices provided by UserProfile
     """
-    return [
-        (name, label)
-        for name, label in UserProfile.GENDER_CHOICES  # pylint: disable=unnecessary-comprehension
-    ]
+    return list(UserProfile.GENDER_CHOICES)
 
 
 def get_valid_year_of_birth_choices():
     """
     List of valid "Year of Birth" choices provided by UserProfile
     """
-    return [
-        (six.text_type(year), six.text_type(year)) for year in UserProfile.VALID_YEARS
-    ]
+    return [(year, year) for year in UserProfile.VALID_YEARS]
 
 
 def get_country_choices():

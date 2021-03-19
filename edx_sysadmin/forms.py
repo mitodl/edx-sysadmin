@@ -16,9 +16,15 @@ class UserRegistrationForm(forms.Form):
     email = forms.EmailField(label="Email Address")
 
     def __init__(self, *args, **kwargs):
-        # extra_fields are used to add fields dynamically in the Form depending upon which
-        # fields are made "required" in the edX platform through REGISTRATION_EXTRA_FIELDS
-        # environment variable
+        """
+        Overrides __init__ method to add dynamic fields in the form
+
+        Arguments:
+        kwargs["extra_fields"] (dict) - Contains data regarding the fields we want to get
+        added dynamically to form depending upon which fields are made "required" in the edX platform
+        through REGISTRATION_EXTRA_FIELDS environment variable
+        """
+
         extra_fields = kwargs.pop("extra_fields", {})
 
         super().__init__(*args, **kwargs)
@@ -31,6 +37,9 @@ class UserRegistrationForm(forms.Form):
                 self.fields[field] = value["field_type"](initial=value["default_value"])
 
     def clean(self):
+        """
+        Overrides clean method to add "confirm_email" to "cleaned_data"
+        """
         cleaned_data = super().clean()
         cleaned_data["confirm_email"] = cleaned_data.get("email", "")
         return cleaned_data

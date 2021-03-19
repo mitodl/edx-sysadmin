@@ -12,8 +12,8 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import condition
 from django.views.generic.base import TemplateView
+
 from opaque_keys.edx.keys import CourseKey
-from six import text_type
 from xmodule.modulestore.django import modulestore
 
 from edx_sysadmin.forms import UserRegistrationForm
@@ -44,7 +44,7 @@ class SysadminDashboardView(TemplateView):
         """
 
         self.def_ms = modulestore()
-        self.msg = u""
+        self.msg = ""
         super().__init__(**kwargs)
 
 
@@ -69,7 +69,7 @@ class CoursesPanel(SysadminDashboardView):
             except Exception as err:  # pylint: disable=broad-except
                 self.msg += _(  # pylint: disable=translation-of-non-string
                     HTML(
-                        u'<div class="error">Error - cannot get course with ID {0}<br/><pre>{1}</pre></div>'
+                        '<div class="error">Error - cannot get course with ID {0}<br/><pre>{1}</pre></div>'
                     )
                 ).format(course_key, escape(str(err)))
 
@@ -78,11 +78,11 @@ class CoursesPanel(SysadminDashboardView):
                 self.def_ms.delete_course(course.id, request.user.id)
                 # don't delete user permission groups, though
                 self.msg += HTML(
-                    u"<font class='success'>{0} {1} = {2} ({3})</font>"
+                    "<font class='success'>{0} {1} = {2} ({3})</font>"
                 ).format(
                     _("Deleted"),
-                    text_type(course.location),
-                    text_type(course.id),
+                    course.location,
+                    course.id,
                     course.display_name,
                 )
 
@@ -124,8 +124,8 @@ class UsersPanel(SysadminDashboardView):
                 create_user_account(form.cleaned_data, request.build_absolute_uri)
             )
         else:
-            context[
-                "error_message"
-            ] = "Unable to create new account due to invalid data"
+            context["error_message"] = _(
+                "Unable to create new account due to invalid data"
+            )
 
         return render(request, self.template_name, context)
