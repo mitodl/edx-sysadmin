@@ -4,7 +4,6 @@ Constants for edx_sysadmin
 
 from django import forms
 
-from edx_sysadmin.utils.markup import HTML
 from edx_sysadmin.utils.utility import (
     get_country_choices,
     get_gender_choices,
