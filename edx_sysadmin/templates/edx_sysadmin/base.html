@@ -13,8 +13,8 @@
             <h1 class="main-heading">{% trans "Sysadmin Dashboard" %}</h1>
             <hr />
             <h2 class="instructor-nav">
-                <a href="{% url 'sysadmin:sysadmin_users' %}">{% trans "Users" %}</a>
-                <a href="{% url 'sysadmin:sysadmin_courses' %}"> {% trans "Courses" %} </a>
+                <a href="{% url 'sysadmin:users' %}">{% trans "Users" %}</a>
+                <a href="{% url 'sysadmin:courses' %}"> {% trans "Courses" %} </a>
             </h2>
             <hr />
             {% block panel %}

@@ -10,6 +10,6 @@ app_name = "sysadmin"
 
 urlpatterns = [
     url("^$", SysadminDashboardView.as_view(), name="sysadmin"),
-    url(r"^courses/?$", CoursesPanel.as_view(), name="sysadmin_courses"),
-    url(r"^users/$", UsersPanel.as_view(), name="sysadmin_users"),
+    url(r"^courses/?$", CoursesPanel.as_view(), name="courses"),
+    url(r"^users/$", UsersPanel.as_view(), name="users"),
 ]

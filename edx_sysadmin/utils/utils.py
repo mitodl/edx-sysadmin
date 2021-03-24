@@ -8,6 +8,7 @@ import requests
 
 from django_countries import countries
 
+from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.http import Http404
@@ -21,7 +22,7 @@ from openedx.core.djangoapps.user_authn.toggles import (
 )
 from xmodule.modulestore.django import modulestore
 
-from edx_sysadmin.utils.markup import HTML
+from edx_sysadmin.utils.markup import HTML, Text
 
 
 User = get_user_model()
@@ -40,7 +41,7 @@ def get_course_by_id(course_key, depth=0):
     if course:
         return course
     else:
-        raise Http404(f"{_('Course not found')}: {course_key}.")
+        raise Http404(f"{_('Course not found')}: {course_key}")
 
 
 def get_registration_required_extra_fields():
@@ -82,19 +83,14 @@ def get_registration_required_extra_fields_with_values():
         }
         ...
     }
-
     """
-    # importing here due to circular import
-    from edx_sysadmin.constants import (  # pylint: disable=import-outside-toplevel,cyclic-import
-        FIELDS_AND_DEFAULT_VALUES_MAP,
-    )
-
     extra_fields = {}
 
     # If Registration API is not functional we can't use it, so no need to process extra fields
     if is_registration_api_functional():
+        fields_and_default_values_map = get_fields_and_default_values_map()
         for field in get_registration_required_extra_fields():
-            mapping = FIELDS_AND_DEFAULT_VALUES_MAP.get(field)
+            mapping = fields_and_default_values_map.get(field)
             if mapping:
                 extra_fields[field] = mapping
     return extra_fields
@@ -167,18 +163,18 @@ def create_user_through_db_models(data):
             profile.name = data.get("name")
             profile.save()
 
-            context["success_message"] = HTML(
-                f"{_('A new account has been registered for user')}: {data['username']}"
-            )
+            context[
+                "success_message"
+            ] = f"{_('A new account has been registered for user')}: {data['username']}"
         else:
-            context["error_message"] = HTML(
-                f"{_('An account already exists with email')}: {data['email']}"
-            )
+            context[
+                "error_message"
+            ] = f"{_('An account already exists with email')}: {data['email']}"
             return context
     except Exception as err:  # pylint: disable=broad-except
-        context["error_message"] = HTML(
-            f"{_('Account could not be created due to following error')}: {err}"
-        )
+        context[
+            "error_message"
+        ] = f"{_('Account could not be created due to following error')}: {err}"
 
     return context
 
@@ -202,13 +198,13 @@ def make_reg_api_request(data):
     resp = requests.post(api_endpoint, data=data)
 
     if resp.status_code == 200:
-        context["success_message"] = HTML(
-            f"{_('A new account has been registered through API for user')}: {data.get('username')}"
-        )
+        context[
+            "success_message"
+        ] = f"{_('A new account has been registered through API for user')}: {data.get('username')}"
     else:
-        context["error_message"] = HTML(
-            f"{_('Account could not be created due to following error(s)')}: {transform_error_message(resp.content)}"
-        )
+        context[
+            "error_message"
+        ] = f"{_('Account could not be created due to following error(s)')}: {transform_error_message(resp.content)}"
 
     return context
 
@@ -237,8 +233,15 @@ def transform_error_message(resp_content):
     message = ""
     for error_key, error_content in content.items():
         if error_content:
-            message += f"<li>{error_key}: {_(error_content[0].get('user_message'))}</li>"  # pylint: disable=translation-of-non-string
-    return f"<ul>{message}</ul>"
+            message += Text("{li_start}{error_key}{error_content}{li_end}").format(
+                li_start=HTML("<li>"),
+                error_key=error_key,
+                error_content=str(error_content[0].get("user_message")),
+                li_end=HTML("</li>"),
+            )
+    return Text("{ul_start}{message}{ul_end}").format(
+        ul_start="<ul>", message=message, ul_end="</ul>"
+    )
 
 
 def get_level_of_education_choices():
@@ -267,3 +270,54 @@ def get_country_choices():
     List of "Country" choices
     """
     return list(countries)
+
+
+def get_fields_and_default_values_map():
+    """
+    It maps registration required extra fields with some pre-defined default values
+
+    Arguments:
+    None
+
+    Returns:
+    fields_and_default_values_map (dict) - contains all required fields and their mapping with default values
+    and form type.
+    {
+        ...
+        "FIELD_NAME": {
+            "field_type": "FIELD_TYPE",
+            "default_value": "DEFAULT_VALUE",     # if applicable
+            "choices": "LIST_OF_OPTIONS"          # if applicable
+        }
+        ...
+    }
+    """
+    return {
+        "level_of_education": {
+            "field_type": forms.TypedChoiceField,
+            "choices": get_level_of_education_choices(),
+        },
+        "gender": {
+            "field_type": forms.TypedChoiceField,
+            "choices": get_gender_choices(),
+        },
+        "year_of_birth": {
+            "field_type": forms.TypedChoiceField,
+            "choices": get_valid_year_of_birth_choices(),
+        },
+        "mailing_address": {
+            "field_type": forms.CharField,
+            "default_value": "This is the default Mailing Address",
+        },
+        "goals": {
+            "field_type": forms.CharField,
+            "default_value": "This is the default Goal",
+        },
+        "honor_code": {"field_type": forms.BooleanField, "default_value": True},
+        "terms_of_service": {"field_type": forms.BooleanField, "default_value": True},
+        "city": {"field_type": forms.CharField, "default_value": "Kabul"},
+        "country": {
+            "field_type": forms.TypedChoiceField,
+            "choices": get_country_choices(),
+        },
+    }

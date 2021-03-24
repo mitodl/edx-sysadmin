@@ -17,8 +17,8 @@ from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 
 from edx_sysadmin.forms import UserRegistrationForm
-from edx_sysadmin.utils.markup import HTML
-from edx_sysadmin.utils.utility import (
+from edx_sysadmin.utils.markup import HTML, Text
+from edx_sysadmin.utils.utils import (
     create_user_account,
     get_course_by_id,
     get_registration_required_extra_fields_with_values,
@@ -67,23 +67,33 @@ class CoursesPanel(SysadminDashboardView):
                 course = get_course_by_id(course_key)
                 course_found = True
             except Exception as err:  # pylint: disable=broad-except
-                self.msg += _(  # pylint: disable=translation-of-non-string
-                    HTML(
-                        '<div class="error">Error - cannot get course with ID {0}<br/><pre>{1}</pre></div>'
+                self.msg += Text(
+                    _(
+                        "{div_start} Error - cannot get course with ID {course_key} {error} {div_end}"
                     )
-                ).format(course_key, escape(str(err)))
+                ).format(
+                    div_start=HTML("<div class='error'>"),
+                    course_key=course_key,
+                    error=HTML("<br/><pre>{error}</pre>").format(
+                        error=escape(str(err))
+                    ),
+                    div_end="</div>",
+                )
 
             if course_found:
                 # delete course that is stored with mongodb backend
                 self.def_ms.delete_course(course.id, request.user.id)
                 # don't delete user permission groups, though
-                self.msg += HTML(
-                    "<font class='success'>{0} {1} = {2} ({3})</font>"
+                self.msg += Text(
+                    _(
+                        "{font_start} Deleted {location} = {course_id} {course_name} {font_end}"
+                    )
                 ).format(
-                    _("Deleted"),
-                    course.location,
-                    course.id,
-                    course.display_name,
+                    font_start=HTML("<font class='success'>"),
+                    location=course.location,
+                    course_id=course.id,
+                    course_name=course.display_name,
+                    font_end=HTML("</font>"),
                 )
 
         context = {"msg": self.msg}

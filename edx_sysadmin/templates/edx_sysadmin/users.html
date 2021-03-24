@@ -5,7 +5,8 @@
 {% block panel %}
     {% if disclaimer %}
 		<div class="disclaimer">
-            <b>Disclaimer</b>: Account Registration API is not function in your platform, User Account will be created through DB Models
+            <b>{% trans "Disclaimer" %}</b>: {% trans "Account Registration API is not functional in your platform, User Account will be created through DB Models" %}<br>
+            {% trans "To make it functional, set" %} <span>ALLOW_PUBLIC_ACCOUNT_CREATION</span> {% trans "to" %} <span>True</span> {% trans "and" %} <span>ENABLE_REQUIRE_THIRD_PARTY_AUTH</span> {% trans "to" %} <span>False</span>.
         </div>
         <hr>
     {% endif %}
