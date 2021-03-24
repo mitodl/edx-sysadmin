@@ -80,5 +80,5 @@ toml==0.10.2
     #   tox
 tox==3.23.0
     # via -r requirements/test.in
-virtualenv==20.4.2
+virtualenv==20.4.3
     # via tox

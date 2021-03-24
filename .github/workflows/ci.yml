@@ -21,9 +21,6 @@ jobs:
       - name: Run black formatter
         run: black --check .
 
-      - name: Run isort
-        run: isort --check-only --diff --recursive tests test_utils edx_sysadmin test_settings.py
-
       - name: Run pylint
         run: pylint edx_sysadmin tests test_utils
 
