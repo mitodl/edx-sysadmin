@@ -227,7 +227,7 @@ class GitLogs(SysadminDashboardView):
         mdb.close()
         context = {
             'logs': logs,
-            'course_id': text_type(course_id) if course_id else None,
+            'course_id': course_id if course_id else None,
             'error_msg': error_msg,
             'page_size': page_size
         }

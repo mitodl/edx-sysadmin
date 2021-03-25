@@ -25,7 +25,7 @@
 </script>
 {% endblock headextra %}
 
-{% block content %}
+{% block panel %}
     <form name="dashform" method="POST" action="${reverse('sysadmin')}">
         <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
         <input type="hidden" name="dash_mode" value="">
@@ -94,4 +94,4 @@
         {% endif %}
         </div>
     {% endif %}
-{% endblock content %}
+{% endblock panel %}
