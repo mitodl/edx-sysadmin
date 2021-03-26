@@ -164,34 +164,6 @@ class GitImport(SysadminDashboardView):
     
     template_name = 'edx_sysadmin/gitimport.html'
 
-    def git_info_for_course(self, cdir):
-        """This pulls out some git info like the last commit"""
-
-        cmd = ''
-        gdir = settings.DATA_DIR / cdir
-        info = ['', '', '']
-
-        # Try the data dir, then try to find it in the git import dir
-        if not gdir.exists():
-            git_repo_dir = getattr(settings, 'GIT_REPO_DIR', git_import.DEFAULT_GIT_REPO_DIR)
-            gdir = path(git_repo_dir) / cdir
-            if not gdir.exists():
-                return info
-
-        cmd = ['git', 'log', '-1',
-               u'--format=format:{ "commit": "%H", "author": "%an %ae", "date": "%ad"}', ]
-        try:
-            output_json = json.loads(subprocess.check_output(cmd, cwd=gdir).decode('utf-8'))
-            info = [output_json['commit'],
-                    output_json['date'],
-                    output_json['author'], ]
-        except OSError as error:
-            log.warning((u"Error fetching git data: %s - %s"), cdir, error)
-        except (ValueError, subprocess.CalledProcessError):
-            pass
-
-        return info
-
     def get_course_from_git(self, gitloc, branch):
         """This downloads and runs the checks for importing a course in git"""
 
