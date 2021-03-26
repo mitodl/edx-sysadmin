@@ -7,10 +7,10 @@ register = template.Library()
 
 
 @register.simple_tag
-def change_time_display(cil):
+def change_time_display(cil_created):
     """ change time display to defualt settings format """
     return get_time_display(
-        cil.created.replace(tzinfo=UTC),
+        cil_created.replace(tzinfo=UTC),
         DEFAULT_DATE_TIME_FORMAT, 
         coerce_tz=settings.TIME_ZONE
     )

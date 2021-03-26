@@ -23,7 +23,7 @@ from xmodule.util.sandboxing import DEFAULT_PYTHON_LIB_FILENAME
 
 log = logging.getLogger(__name__)
 
-DEFAULT_GIT_REPO_DIR = '/edx/var/app/edxapp/course_repos'
+DEFAULT_GIT_REPO_DIR = '/edx/var/app/edxapp/git_course_repos'
 
 
 class GitImportError(Exception):
@@ -118,7 +118,7 @@ def cmd_log(cmd, cwd):
     """
     output = subprocess.check_output(cmd, cwd=cwd, stderr=subprocess.STDOUT).decode('utf-8')
 
-    log.debug(u'Command was: %r. Working directory was: %r', ' '.join(cmd), cwd)
+    log.debug(u'Command was: %s. Working directory was: %s', ' '.join(cmd), cwd)
     log.debug(u'Command output was: %r', output)
     return output
 

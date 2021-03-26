@@ -4,7 +4,7 @@ Database models for edx_sysadmin.
 
 import mongoengine
 
-from xmodule.modulestore.mongoengine_fields import CourseKeyField
+from opaque_keys.edx.django.models import CourseKeyField
 
 
 class CourseImportLog(mongoengine.Document):

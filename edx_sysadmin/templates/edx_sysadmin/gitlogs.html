@@ -57,7 +57,7 @@
             <tbody>
             {% for cil in logs %}
                 <tr>
-                    <td>{% change_time_display cil %}</td>
+                    <td>{% change_time_display cil.created %}</td>
                     <td>
                     <a href="{% url 'sysadmin:gitlogs_detail' cil.course_id %}">
                         {{cil.course_id}}
