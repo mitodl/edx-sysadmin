@@ -95,7 +95,7 @@ class CoursesPanel(SysadminDashboardView):
                     error=HTML("<br/><pre>{error}</pre>").format(
                         error=escape(str(err))
                     ),
-                    div_end="</div>",
+                    div_end=HTML("</div>"),
                 )
 
             if course_found:
@@ -156,21 +156,28 @@ class UsersPanel(SysadminDashboardView):
                 "Unable to create new account due to invalid data"
             )
 
+        return render(request, self.template_name, context)
+
 
 class GitImport(SysadminDashboardView):
     """
     This provide the view to load new course from github
     """
-    
-    template_name = 'edx_sysadmin/gitimport.html'
+
+    template_name = "edx_sysadmin/gitimport.html"
 
     def get_course_from_git(self, gitloc, branch):
         """This downloads and runs the checks for importing a course in git"""
 
-        if not (gitloc.endswith('.git') or gitloc.startswith('http:') or
-                gitloc.startswith('https:') or gitloc.startswith('git:')):
-            return _("The git repo location should end with '.git', "
-                     "and be a valid url")
+        if not (
+            gitloc.endswith(".git")
+            or gitloc.startswith("http:")
+            or gitloc.startswith("https:")
+            or gitloc.startswith("git:")
+        ):
+            return _(
+                "The git repo location should end with '.git', " "and be a valid url"
+            )
 
         return self.import_mongo_course(gitloc, branch)
 
@@ -180,19 +187,21 @@ class GitImport(SysadminDashboardView):
         at debug level for display in template
         """
 
-        msg = u''
+        msg = u""
 
-        log.debug(u'Adding course using git repo %s', gitloc)
+        log.debug(u"Adding course using git repo %s", gitloc)
 
         # Grab logging output for debugging imports
         output = StringIO()
         import_log_handler = logging.StreamHandler(output)
         import_log_handler.setLevel(logging.DEBUG)
 
-        logger_names = ['xmodule.modulestore.xml_importer',
-                        'lms.djangoapps.dashboard.git_import',
-                        'xmodule.modulestore.xml',
-                        'xmodule.seq_module', ]
+        logger_names = [
+            "xmodule.modulestore.xml_importer",
+            "lms.djangoapps.dashboard.git_import",
+            "xmodule.modulestore.xml",
+            "xmodule.seq_module",
+        ]
         loggers = []
 
         for logger_name in logger_names:
@@ -201,7 +210,7 @@ class GitImport(SysadminDashboardView):
             logger.addHandler(import_log_handler)
             loggers.append(logger)
 
-        error_msg = ''
+        error_msg = ""
         try:
             git_import.add_repo(gitloc, None, branch)
         except GitImportError as ex:
@@ -215,10 +224,10 @@ class GitImport(SysadminDashboardView):
 
         if error_msg:
             msg_header = error_msg
-            color = 'red'
+            color = "red"
         else:
-            msg_header = _('Added Course')
-            color = 'blue'
+            msg_header = _("Added Course")
+            color = "blue"
 
         msg = HTML(u"<h4 style='color:{0}'>{1}</h4>").format(color, msg_header)
         msg += HTML(u"<pre>{0}</pre>").format(escape(ret))
@@ -230,11 +239,21 @@ class GitImport(SysadminDashboardView):
         if not request.user.is_staff:
             raise Http404
 
-        action = request.POST.get('action', '')
+        action = request.POST.get("action", "")
 
-        if action == 'add_course':
-            gitloc = request.POST.get('repo_location', '').strip().replace(' ', '').replace(';', '')
-            branch = request.POST.get('repo_branch', '').strip().replace(' ', '').replace(';', '')
+        if action == "add_course":
+            gitloc = (
+                request.POST.get("repo_location", "")
+                .strip()
+                .replace(" ", "")
+                .replace(";", "")
+            )
+            branch = (
+                request.POST.get("repo_branch", "")
+                .strip()
+                .replace(" ", "")
+                .replace(";", "")
+            )
             self.msg += self.get_course_from_git(gitloc, branch)
 
         context = {"msg": self.msg}
@@ -248,13 +267,13 @@ class GitLogs(SysadminDashboardView):
     their xml
     """
 
-    template_name = 'edx_sysadmin/gitlogs.html'
+    template_name = "edx_sysadmin/gitlogs.html"
 
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         """Shows logs of imports that happened as a result of a git import"""
 
-        course_id = kwargs.get('course_id')
+        course_id = kwargs.get("course_id")
         if course_id:
             course_id = CourseKey.from_string(course_id)
 
@@ -262,66 +281,76 @@ class GitLogs(SysadminDashboardView):
 
         # Set mongodb defaults even if it isn't defined in settings
         mongo_db = {
-            'host': 'localhost',
-            'user': '',
-            'password': '',
-            'db': 'xlog',
+            "host": "localhost",
+            "user": "",
+            "password": "",
+            "db": "xlog",
         }
 
         # Allow overrides
-        if hasattr(settings, 'MONGODB_LOG'):
-            for config_item in ['host', 'user', 'password', 'db', ]:
+        if hasattr(settings, "MONGODB_LOG"):
+            for config_item in [
+                "host",
+                "user",
+                "password",
+                "db",
+            ]:
                 mongo_db[config_item] = settings.MONGODB_LOG.get(
-                    config_item, mongo_db[config_item])
+                    config_item, mongo_db[config_item]
+                )
 
-        mongouri = 'mongodb://{user}:{password}@{host}/{db}'.format(**mongo_db)
+        mongouri = "mongodb://{user}:{password}@{host}/{db}".format(**mongo_db)
 
-        error_msg = ''
+        error_msg = ""
 
         try:
-            if mongo_db['user'] and mongo_db['password']:
-                mdb = mongoengine.connect(mongo_db['db'], host=mongouri)
+            if mongo_db["user"] and mongo_db["password"]:
+                mdb = mongoengine.connect(mongo_db["db"], host=mongouri)
             else:
-                mdb = mongoengine.connect(mongo_db['db'], host=mongo_db['host'])
+                mdb = mongoengine.connect(mongo_db["db"], host=mongo_db["host"])
         except mongoengine.connection.ConnectionError:
-            log.exception('Unable to connect to mongodb to save log, '
-                          'please check MONGODB_LOG settings.')
+            log.exception(
+                "Unable to connect to mongodb to save log, "
+                "please check MONGODB_LOG settings."
+            )
 
         if course_id is None:
             # Require staff if not going to specific course
             if not request.user.is_staff:
                 raise Http404
-            cilset = CourseImportLog.objects.order_by('-created')
+            cilset = CourseImportLog.objects.order_by("-created")
         else:
             # Allow only course team, instructors, and staff
-            if not (request.user.is_staff or
-                    CourseInstructorRole(course_id).has_user(request.user) or
-                    CourseStaffRole(course_id).has_user(request.user)):
+            if not (
+                request.user.is_staff
+                or CourseInstructorRole(course_id).has_user(request.user)
+                or CourseStaffRole(course_id).has_user(request.user)
+            ):
                 raise Http404
-            log.debug('course_id=%s', course_id)
-            cilset = CourseImportLog.objects.filter(
-                course_id=course_id
-            ).order_by('-created')
-            log.debug(u'cilset length=%s', len(cilset))
+            log.debug("course_id=%s", course_id)
+            cilset = CourseImportLog.objects.filter(course_id=course_id).order_by(
+                "-created"
+            )
+            log.debug(u"cilset length=%s", len(cilset))
 
         # Paginate the query set
         paginator = Paginator(cilset, page_size)
         try:
-            logs = paginator.page(request.GET.get('page'))
+            logs = paginator.page(request.GET.get("page"))
         except PageNotAnInteger:
             logs = paginator.page(1)
         except EmptyPage:
             # If the page is too high or low
-            given_page = int(request.GET.get('page'))
+            given_page = int(request.GET.get("page"))
             page = min(max(1, given_page), paginator.num_pages)
             logs = paginator.page(page)
 
         mdb.close()
         context = {
-            'logs': logs,
-            'course_id': course_id if course_id else None,
-            'error_msg': error_msg,
-            'page_size': page_size
+            "logs": logs,
+            "course_id": course_id if course_id else None,
+            "error_msg": error_msg,
+            "page_size": page_size,
         }
 
         return render(request, self.template_name, context)

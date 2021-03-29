@@ -13,10 +13,10 @@
     <h3>{% trans "Register Users" %}</h3><br/>
 
     {% if error_message %}
-		<div class="error_message">{{error_message}}</div>
+		<div class="error_message">{{error_message|safe}}</div>
     {% endif %}
     {% if success_message %}
-        <div class="success_message">{{success_message}}</div>
+        <div class="success_message">{{success_message|safe}}</div>
     {% endif %}
 
     <form name="action" method="POST">

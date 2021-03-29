@@ -193,7 +193,7 @@ def make_reg_api_request(data):
     context = {}
 
     api_endpoint = urllib.parse.urljoin(
-        get_lms_base_url(), reverse("user_api_registration")
+        get_lms_root_url(), reverse("user_api_registration")
     )
     resp = requests.post(api_endpoint, data=data)
 
@@ -209,14 +209,14 @@ def make_reg_api_request(data):
     return context
 
 
-def get_lms_base_url():
+def get_lms_root_url():
     """
-    It returns LMS base url of edx-platform
+    It returns LMS Root URL of edx-platform
 
     Returns:
-    url (str) - LMS base url
+    url (str) - LMS Root URL
     """
-    return settings.LMS_BASE
+    return settings.LMS_ROOT_URL
 
 
 def transform_error_message(resp_content):
@@ -233,14 +233,19 @@ def transform_error_message(resp_content):
     message = ""
     for error_key, error_content in content.items():
         if error_content:
-            message += Text("{li_start}{error_key}{error_content}{li_end}").format(
+            error_message = (
+                str(error_content[0].get("user_message"))
+                if isinstance(error_content, list)
+                else error_content
+            )
+            message += Text("{li_start} {error_key}: {error_content} {li_end}").format(
                 li_start=HTML("<li>"),
                 error_key=error_key,
-                error_content=str(error_content[0].get("user_message")),
+                error_content=error_message,
                 li_end=HTML("</li>"),
             )
-    return Text("{ul_start}{message}{ul_end}").format(
-        ul_start="<ul>", message=message, ul_end="</ul>"
+    return Text("{ul_start} {message} {ul_end}").format(
+        ul_start=HTML("<ul>"), message=message, ul_end=HTML("</ul>")
     )
 
 
