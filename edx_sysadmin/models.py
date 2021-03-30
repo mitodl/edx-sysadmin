@@ -9,6 +9,7 @@ from xmodule.modulestore.mongoengine_fields import CourseKeyField
 
 class CourseImportLog(mongoengine.Document):
     """Mongoengine model for git log"""
+
     course_id = CourseKeyField(max_length=128)
     # NOTE: this location is not a Location object but a pathname
     location = mongoengine.StringField(max_length=168)
@@ -19,5 +20,4 @@ class CourseImportLog(mongoengine.Document):
     author = mongoengine.StringField(max_length=500, null=True)
     date = mongoengine.DateTimeField()
     created = mongoengine.DateTimeField()
-    meta = {'indexes': ['course_id', 'created'],
-            'allow_inheritance': False}
+    meta = {"indexes": ["course_id", "created"], "allow_inheritance": False}
