@@ -19,4 +19,9 @@ class EdxSysAdminConfig(AppConfig):
                 "regex": "^sysadmin/",
             }
         },
+        "settings_config": {
+            "lms.djangoapp": {
+                "common": {"relative_path": "settings.common"},
+            }
+        },
     }
