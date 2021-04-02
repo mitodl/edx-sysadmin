@@ -326,3 +326,22 @@ def get_fields_and_default_values_map():
             "choices": get_country_choices(),
         },
     }
+
+
+def user_has_access_to_sysadmin(user):
+    """
+    Checks if user has access to sysadmin panel or not
+    :param user: User object of currently loggedin user
+    :return boolean: True if user has access to syadmin else False
+    """
+    # TODO: Give access to Course Admins
+    if user and user.is_staff:
+        return True
+
+
+def show_sysadmin_dashboard(user):
+    """
+    Checks if all the requirements for showing edx-sysadmin are fulfilled
+    :return boolean: True if all requirements are fulfilled else False
+    """
+    return user_has_access_to_sysadmin(user)
