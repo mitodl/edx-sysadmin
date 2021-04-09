@@ -26,6 +26,7 @@ log = logging.getLogger(__name__)
 DEFAULT_GIT_REPO_DIR = "/edx/var/app/edxapp/git_course_repos"
 
 
+# pylint: disable=raise-missing-from
 class GitImportError(Exception):
     """
     Exception class for handling the typical errors in a git import.
@@ -36,7 +37,7 @@ class GitImportError(Exception):
     def __init__(self, message=None):
         if message is None:
             message = self.MESSAGE
-        super(GitImportError, self).__init__(message)
+        super().__init__(message)
 
 
 class GitImportErrorNoDir(GitImportError):
@@ -45,7 +46,7 @@ class GitImportErrorNoDir(GitImportError):
     """
 
     def __init__(self, repo_dir):
-        super(GitImportErrorNoDir, self).__init__(
+        super().__init__(
             _(
                 u"Path {0} doesn't exist, please create it, "
                 u"or configure a different path with "

@@ -2,12 +2,9 @@
 """
 Views for the Open edX SysAdmin Plugin
 """
-import json
 import logging
-import os
-import subprocess
-import warnings
 
+from io import StringIO
 import mongoengine
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
@@ -22,11 +19,9 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import condition
 from django.views.generic.base import TemplateView
-from path import Path as path
-from io import StringIO
 
-from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from opaque_keys.edx.keys import CourseKey
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from xmodule.modulestore.django import modulestore
 
 from edx_sysadmin.git_import import GitImportError
@@ -308,7 +303,7 @@ class GitLogs(SysadminDashboardView):
                 mdb = mongoengine.connect(mongo_db["db"], host=mongouri)
             else:
                 mdb = mongoengine.connect(mongo_db["db"], host=mongo_db["host"])
-        except mongoengine.connection.ConnectionError:
+        except mongoengine.connection.ConnectionError:  # pylint: disable=no-member
             log.exception(
                 "Unable to connect to mongodb to save log, "
                 "please check MONGODB_LOG settings."

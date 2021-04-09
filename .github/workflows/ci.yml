@@ -12,17 +12,20 @@ jobs:
         with:
           python-version: "3.8"
 
-      - name: Install requirements
+      - name: Install quality equirements
         run: pip install -r ./requirements/quality.txt
-
-      - name: Run tox
-        run: tox
 
       - name: Run black formatter
         run: black --check .
 
-      - name: Run pylint
-        run: pylint edx_sysadmin tests test_utils
+      - name: Setup edX & Run Tests
+        run: |
+          cd ..
+          git clone https://github.com/edx/devstack.git
+          cd devstack
+          sed -i 's/:cached//g' ./docker-compose-host.yml
+          make dev.clone.https
+          DEVSTACK_WORKSPACE=$PWD/.. docker-compose -f docker-compose.yml -f docker-compose-host.yml run -v $PWD/../edx-sysadmin:/edx-sysadmin lms /edx-sysadmin/run_devstack_integration_tests.sh
 
       - name: Upload coverage to CodeCov
         uses: codecov/codecov-action@v1

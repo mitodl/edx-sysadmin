@@ -1,7 +1,11 @@
+"""
+Provide extra utilities for templates
+"""
+
 from django import template
 from django.utils.timezone import utc as UTC
-from common.djangoapps.util.date_utils import get_time_display, DEFAULT_DATE_TIME_FORMAT
 from django.conf import settings
+from common.djangoapps.util.date_utils import get_time_display, DEFAULT_DATE_TIME_FORMAT
 
 register = template.Library()
 

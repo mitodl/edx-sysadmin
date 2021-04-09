@@ -42,7 +42,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """Check inputs and run the command"""
-
         if isinstance(modulestore, XMLModuleStore):
             raise CommandError("This script requires a mongo module store")
 
@@ -56,4 +55,4 @@ class Command(BaseCommand):
         try:
             git_import.add_repo(options["repository_url"], rdir_arg, branch)
         except git_import.GitImportError as ex:
-            raise CommandError(str(ex))
+            raise CommandError(str(ex))  # pylint: disable=raise-missing-from
