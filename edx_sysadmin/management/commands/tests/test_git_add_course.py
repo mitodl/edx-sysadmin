@@ -7,7 +7,6 @@ import logging
 import os
 import shutil
 import subprocess
-import unittest
 from uuid import uuid4
 
 import six
@@ -45,10 +44,6 @@ TEST_MONGODB_LOG = {
     MONGODB_LOG=TEST_MONGODB_LOG,
     GIT_REPO_DIR=settings.TEST_ROOT / "course_repos_{}".format(uuid4().hex),
 )
-@unittest.skipUnless(
-    settings.FEATURES.get("ENABLE_SYSADMIN_DASHBOARD"),
-    "ENABLE_SYSADMIN_DASHBOARD not set",
-)
 class TestGitAddCourse(SharedModuleStoreTestCase):
     """
     Tests the git_add_course management command for proper functions.
@@ -62,7 +57,7 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
     ENABLED_CACHES = ["default", "mongo_metadata_inheritance", "loc_cache"]
 
     def setUp(self):
-        super(TestGitAddCourse, self).setUp()
+        super().setUp()
         self.git_repo_dir = settings.GIT_REPO_DIR
 
     def assertCommandFailureRegexp(self, regex, *args):
