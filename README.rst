@@ -7,13 +7,7 @@ and transitioned to as separate plugin.
 
 NOTE:
 It is recommended that you use edx-sysadmin plugin with Open edX's `lilac <https://github.com/edx/edx-platform/tree/open-release/lilac.master>`_ release and successors.
-If you wish to use the ``Sysadmin Dashboard`` with Open edX releases before ``lilac`` you should just enable ``ENABLE_SYSADMIN_DASHBOARD`` feature flag in environment files (e.g ``lms.yml`` or ``lms.env.json``) to access sysadmin dashboard features.
-
-Overview
-------------------------
-
-The edx-sysadmin plugin equips the admin users with certain handy operation in Open edX which would otherwise be difficult to perform manually.
-This plugin is just like other django applications except for the parts that really make it able to be integrated with edx-platform and to understand those you might want to take a look at `this link. <https://github.com/edx/edx-django-utils/tree/master/edx_django_utils/plugins>`_
+If you wish to use the ``Sysadmin Dashboard`` with Open edX releases before ``lilac`` you don't have to install this plugin and can simply enable ``ENABLE_SYSADMIN_DASHBOARD`` feature flag in environment files (e.g ``lms.yml`` or ``lms.env.json``) to access sysadmin dashboard features.
 
 Features
 ~~~~~~~~
