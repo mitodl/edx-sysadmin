@@ -5,7 +5,6 @@ import glob
 import os
 import re
 import shutil
-import unittest
 from datetime import datetime
 from uuid import uuid4
 
@@ -28,11 +27,7 @@ from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.date_utils import DEFAULT_DATE_TIME_FORMAT, get_time_display
 from edx_sysadmin.git_import import GitImportErrorNoDir
-
-# from lms.djangoapps.dashboard.git_import import GitImportErrorNoDir
 from edx_sysadmin.models import CourseImportLog
-
-# from lms.djangoapps.dashboard.models import CourseImportLog
 from openedx.core.djangolib.markup import Text
 
 TEST_MONGODB_LOG = {
@@ -123,10 +118,6 @@ class SysadminBaseTestCase(SharedModuleStoreTestCase):
 @override_settings(
     MONGODB_LOG=TEST_MONGODB_LOG,
     GIT_REPO_DIR=settings.TEST_ROOT / f"course_repos_{uuid4().hex}",
-)
-@unittest.skipUnless(
-    settings.FEATURES.get("ENABLE_SYSADMIN_DASHBOARD"),
-    "ENABLE_SYSADMIN_DASHBOARD not set",
 )
 class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
     """
