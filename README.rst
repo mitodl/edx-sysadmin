@@ -36,39 +36,60 @@ Installing The Plugin
 Development Workflow
 --------------------
 
-One Time Setup
-~~~~~~~~~~~~~~
+For development you need to install this plugin into your Open edX instance.
 
 .. code-block::
 
-  # Clone the repository
+  # Clone edx-sysadmin to a directory which can be accessed from inside lms container i.e. ``src`` folder of
+  # Open edX devstack setup, which is present under root directory (sibling directory of edx-platform directory)
+  # and mapped at ``/edx/src`` inside edx-platform's lms container.
+  cd src
   git clone git@github.com:mitodl/edx-sysadmin.git
-  cd edx-sysadmin
-  # Set up a virtual environment and activate it
-  virtualenv -p python3.8 venv_sysadmin && source venv_sysadmin/bin/activate
 
-Every time you develop something in this repo
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Open LMS shell
+  cd ../devstack
+  make lms-shell
+
+  # Remove edx-sysadmin plugin if already installed
+  pip uninstall edx-sysadmin
+
+  # Install plugin in editable mode
+  pip install -e /edx/src/edx-sysadmin
+
+  # If edx-sysadmin plugin doesn't reflect anything you can simply restart lms container (optional)
+  make lms-restart
+
+After installation the plugin should be directly getting served through your edx-sysadmin cloned repo (present at src folder) and you can do live changes to the plugin and they will be reflected in your Open edX instance.
+
+Testing
+~~~~~~~
+
+edx-sysadmin tests are dependednt on edx-platform that's why they can only be run from inside of lms shell
 
 .. code-block::
 
-  # Activate the virtualenv
-  source venv_sysadmin/bin/activate
-  # Get into edx-sysadmin repo directory
-  cd edx-sysadmin
-  # Grab the latest code
-  git checkout master
-  git pull
-  # Install/update the dev requirements
-  make requirements
-  # Make a new branch for your changes
-  git checkout -b <your_github_username>/<short_description>
-  # Using your favorite editor, edit the code to make your change.
-  e.g. vim …
-  # Commit all your changes
-  git commit …
-  git push
-  # Open a PR and ask for review.
+  # Enter LMS shell
+  cd devstack
+  make lms-shell
+
+  # Go to the directory where edx-sysadmin is mapped inside container i.e. ``/edx/src/edx-sysadmin``
+  cd /edx/src/edx-sysadmin
+
+  # Install requirements for running tests (you can also install requirements inside a virtual environment)
+  pip install -r ./requirements/quality.txt
+
+  # Run Pytest
+  pytest .
+
+  # Run black formatter
+  black --check .
+
+  # Run Pycodestyle
+  pycodestyle edx_sysadmin tests
+
+  # Run Pylint
+  pylint ./edx_sysadmin
+
 
 License
 -------
@@ -81,4 +102,4 @@ How To Contribute
 -----------------
 
 Contributions are very welcome.
-Even though they were written with ``edx-platform`` in mind, the guidelines should be followed for all Open edX projects.
+Even though they were written with ``edx-platform`` in mind, the guidelines should be followed in all Open edX projects including this plugin.
