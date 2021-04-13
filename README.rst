@@ -1,96 +1,105 @@
 edx-sysadmin
 =============================
 
-|pypi-badge| |travis-badge| |codecov-badge| |doc-badge| |pyversions-badge|
-|license-badge|
+This is a django app plugin extracted from `edx-platform <https://github.com/edx/edx-platform>`_ which enables certian users to perform some specific operations in Open edX environment (which are described under ``Features`` section below).
+Earlier, ``Sysadmin Dashboard`` was a part of ``edx-platform``, however starting from `lilac release <https://github.com/edx/edx-platform/tree/open-release/lilac.master>`_ of Open edX the sysadmin panel has been removed
+and transitioned to as separate plugin.
 
-The ``README.rst`` file should start with a brief description of the repository,
-which sets it in the context of other repositories under the ``edx``
-organization. It should make clear where this fits in to the overall edX
-codebase.
+NOTE:
+It is recommended that you use edx-sysadmin plugin with Open edX's `lilac <https://github.com/edx/edx-platform/tree/open-release/lilac.master>`_ release and successors.
+If you wish to use the ``Sysadmin Dashboard`` with Open edX releases before ``lilac`` you don't have to install this plugin and can simply enable ``ENABLE_SYSADMIN_DASHBOARD`` feature flag in environment files (e.g ``lms.yml`` or ``lms.env.json``) to access sysadmin dashboard features.
 
-An Open edX plugin to enable SysAdmin panel
+Features
+~~~~~~~~
 
-Overview (please modify)
-------------------------
+edx-sysadmin provides different features such as:
 
-The ``README.rst`` file should then provide an overview of the code in this
-repository, including the main components and useful entry points for starting
-to understand the code in more detail.
+* Register Users:
+    * You can ``register new user accounts`` with an easy to use form via ``Users`` tab.
+* Delete Courses:
+    * You can ``delete any course by using a course ID or directory`` via ``Courses`` tab.
+* Git Import:
+    * You can ``import any course maintained through a git repository`` via ``Git Import`` tab.
+* Git Logs
+    * You can ``check the logs for all imported courses`` through git via ``Git Logs`` tab.
 
-Documentation
--------------
+Installing The Plugin
+~~~~~~~~~~~~~~~~~~~~~
 
-(TODO: `Set up documentation <https://openedx.atlassian.net/wiki/spaces/DOC/pages/21627535/Publish+Documentation+on+Read+the+Docs>`_)
+* You can install the plugin into your Open edX environment using PyPI e.g. ``pip install edx-sysadmin`` or directly from github e.g. ``pip install https://github.com/mitodl/edx-sysadmin.git``
+* Once you have installed the plugin you can visit ``<EDX_BASE_URL>/sysadmin`` to access the plugin features.
+* If you decide to make your own changes in the plugin you can go to ``Development Workflow`` section below.
+
+``Note``: In some cases you might need to restart edx-platform after installing the plugin to reflect the changes.
+
 
 Development Workflow
 --------------------
 
-One Time Setup
-~~~~~~~~~~~~~~
+For development you need to install this plugin into your Open edX instance.
+
 .. code-block::
 
-  # Clone the repository
-  git clone git@github.com:edx/edx-sysadmin.git
-  cd edx-sysadmin
+  # Clone edx-sysadmin to a directory which can be accessed from inside lms container i.e. ``src`` folder of
+  # Open edX devstack setup, which is present under root directory (sibling directory of edx-platform directory)
+  # and mapped at ``/edx/src`` inside edx-platform's lms container.
+  cd src
+  git clone git@github.com:mitodl/edx-sysadmin.git
 
-  # Set up a virtualenv using virtualenvwrapper with the same name as the repo and activate it
-  mkvirtualenv -p python3.8 edx-sysadmin
+  # Open LMS shell
+  cd ../devstack
+  make lms-shell
 
+  # Remove edx-sysadmin plugin if already installed
+  pip uninstall edx-sysadmin
 
-Every time you develop something in this repo
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Install plugin in editable mode
+  pip install -e /edx/src/edx-sysadmin
+
+  # If edx-sysadmin plugin doesn't reflect anything you can simply restart lms container (optional)
+  make lms-restart
+
+After installation the plugin should be directly getting served through your edx-sysadmin cloned repo (present at src folder) and you can do live changes to the plugin and they will be reflected in your Open edX instance.
+
+Testing
+~~~~~~~
+
+edx-sysadmin tests are dependednt on edx-platform that's why they can only be run from inside of lms shell
+
 .. code-block::
 
-  # Activate the virtualenv
-  workon edx-sysadmin
+  # Enter LMS shell
+  cd devstack
+  make lms-shell
 
-  # Grab the latest code
-  git checkout master
-  git pull
+  # Go to the directory where edx-sysadmin is mapped inside container i.e. ``/edx/src/edx-sysadmin``
+  cd /edx/src/edx-sysadmin
 
-  # Install/update the dev requirements
-  make requirements
+  # Install requirements for running tests (you can also install requirements inside a virtual environment)
+  pip install -r ./requirements/quality.txt
 
-  # Run the tests and quality checks (to verify the status before you make any changes)
-  make validate
+  # Run Pytest
+  pytest .
 
-  # Make a new branch for your changes
-  git checkout -b <your_github_username>/<short_description>
+  # Run black formatter
+  black --check .
 
-  # Using your favorite editor, edit the code to make your change.
-  vim …
+  # Run Pycodestyle
+  pycodestyle edx_sysadmin tests
 
-  # Run your new tests
-  pytest ./path/to/new/tests
+  # Run Pylint
+  pylint ./edx_sysadmin
 
-  # Run all the tests and quality checks
-  make validate
-
-  # Commit all your changes
-  git commit …
-  git push
-
-  # Open a PR and ask for review.
 
 License
 -------
 
 The code in this repository is licensed under the AGPL 3.0 unless
 otherwise noted.
-
 Please see `LICENSE.txt <LICENSE.txt>`_ for details.
 
 How To Contribute
 -----------------
 
 Contributions are very welcome.
-Please read `How To Contribute <https://github.com/edx/edx-platform/blob/master/CONTRIBUTING.rst>`_ for details.
-Even though they were written with ``edx-platform`` in mind, the guidelines
-should be followed for all Open edX projects.
-
-The pull request description template should be automatically applied if you are creating a pull request from GitHub. Otherwise you
-can find it at `PULL_REQUEST_TEMPLATE.md <.github/PULL_REQUEST_TEMPLATE.md>`_.
-
-The issue report template should be automatically applied if you are creating an issue on GitHub as well. Otherwise you
-can find it at `ISSUE_TEMPLATE.md <.github/ISSUE_TEMPLATE.md>`_.
+Even though they were written with ``edx-platform`` in mind, the guidelines should be followed in all Open edX projects including this plugin.
