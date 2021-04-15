@@ -1,4 +1,3 @@
-# pylint: disable=import-error
 """
 Utility function defined here.
 """
@@ -16,6 +15,9 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from common.djangoapps.student.models import UserProfile
+from common.djangoapps.student.roles import (
+    CourseInstructorRole,
+)
 from common.djangoapps.util.password_policy_validators import normalize_password
 from openedx.core.djangoapps.user_authn.toggles import (
     is_require_third_party_auth_enabled,
@@ -334,9 +336,14 @@ def user_has_access_to_sysadmin(user):
     :param user: User object of currently loggedin user
     :return boolean: True if user has access to syadmin else False
     """
-    # TODO: Give access to Course Admins
-    if user and user.is_staff:
+    if (
+        user_has_access_to_users_panel(user)
+        or user_has_access_to_courses_panel(user)
+        or user_has_access_to_git_logs_panel(user)
+        or user_has_access_to_git_import_panel(user)
+    ):
         return True
+    return False
 
 
 def show_sysadmin_dashboard(user):
@@ -345,3 +352,50 @@ def show_sysadmin_dashboard(user):
     :return boolean: True if all requirements are fulfilled else False
     """
     return user_has_access_to_sysadmin(user)
+
+
+def user_has_access_to_users_panel(user):
+    """
+    Checks if user has access to "Users" panel or not
+    :param user: User object of currently loggedin user
+    :return boolean: True if user has access to "Users" panel else False
+    """
+    if user and user.is_staff:
+        return True
+    return False
+
+
+def user_has_access_to_courses_panel(user):
+    """
+    Checks if user has access to "Courses" panel or not
+    :param user: User object of currently loggedin user
+    :return boolean: True if user has access to "Courses" panel else False
+    """
+    if user and user.is_staff:
+        return True
+    return False
+
+
+def user_has_access_to_git_logs_panel(user):
+    """
+    Checks if user has access to "Git Logs" panel or not
+    :param user: User object of currently loggedin user
+    :return boolean: True if user has access to "Git Logs" panel else False
+    """
+    if user and (
+        user.is_staff
+        or user.courseaccessrole_set.filter(role=CourseInstructorRole.ROLE).exists()
+    ):
+        return True
+    return False
+
+
+def user_has_access_to_git_import_panel(user):
+    """
+    Checks if user has access to "Git Import" panel or not
+    :param user: User object of currently loggedin user
+    :return boolean: True if user has access to "Git Import" panel else False
+    """
+    if user and user.is_staff:
+        return True
+    return False

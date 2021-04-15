@@ -4,8 +4,8 @@ URLs for edx_sysadmin.
 from django.conf.urls import url
 
 from edx_sysadmin.views import (
+    SysadminDashboardRedirectionView,
     CoursesPanel,
-    SysadminDashboardView,
     UsersPanel,
     GitImport,
     GitLogs,
@@ -15,7 +15,7 @@ app_name = "sysadmin"
 
 
 urlpatterns = [
-    url("^$", SysadminDashboardView.as_view(), name="sysadmin"),
+    url("^$", SysadminDashboardRedirectionView.as_view(), name="sysadmin"),
     url(r"^courses/?$", CoursesPanel.as_view(), name="courses"),
     url(r"^gitimport/$", GitImport.as_view(), name="gitimport"),
     url(r"^gitlogs/?$", GitLogs.as_view(), name="gitlogs"),
