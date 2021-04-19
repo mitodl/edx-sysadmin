@@ -99,6 +99,10 @@ textarea {
 	margin-left: 10px;
 }
 
+.instructor-nav a.active {
+	text-decoration: underline;
+}
+
 .disclaimer {
 	line-height: 1.5rem;
 	text-align: center;

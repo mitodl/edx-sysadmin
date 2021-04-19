@@ -7,9 +7,11 @@ import logging
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.translation import ugettext as _
 
-from edx_sysadmin import git_import
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml import XMLModuleStore
+
+from edx_sysadmin import git_import
+
 
 log = logging.getLogger(__name__)
 

@@ -1,4 +1,3 @@
-# pylint: disable=import-error
 """
 Views for the Open edX SysAdmin Plugin
 """
@@ -6,8 +5,7 @@ import logging
 
 from io import StringIO
 import mongoengine
-from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import user_passes_test
 from django.conf import settings
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import Http404
@@ -15,13 +13,14 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
+from django.urls import reverse
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import condition
-from django.views.generic.base import TemplateView
+from django.views.generic.base import TemplateView, RedirectView
 
 from opaque_keys.edx.keys import CourseKey
-from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.roles import CourseInstructorRole
 from xmodule.modulestore.django import modulestore
 
 from edx_sysadmin.git_import import GitImportError
@@ -34,44 +33,88 @@ from edx_sysadmin.utils.utils import (
     get_course_by_id,
     get_registration_required_extra_fields_with_values,
     is_registration_api_functional,
+    user_has_access_to_users_panel,
+    user_has_access_to_courses_panel,
+    user_has_access_to_git_logs_panel,
+    user_has_access_to_git_import_panel,
+    user_has_access_to_sysadmin,
 )
+
 
 log = logging.getLogger(__name__)
 
 
+@method_decorator(user_passes_test(user_has_access_to_sysadmin), name="dispatch")
+class SysadminDashboardRedirectionView(RedirectView):
+    """Redirection view to land user to specific panel"""
+
+    def get_redirect_url(self, *args, **kwargs):
+        """Override redirection_url"""
+
+        if user_has_access_to_users_panel(self.request.user):
+            return reverse("sysadmin:users")
+        elif user_has_access_to_courses_panel(self.request.user):
+            return reverse("sysadmin:courses")
+        elif user_has_access_to_git_logs_panel(self.request.user):
+            return reverse("sysadmin:gitlogs")
+        elif user_has_access_to_git_import_panel(self.request.user):
+            return reverse("sysadmin:gitimport")
+        else:
+            raise Http404
+
+
 @method_decorator(ensure_csrf_cookie, name="dispatch")
-@method_decorator(staff_member_required, name="dispatch")
+@method_decorator(user_passes_test(user_has_access_to_sysadmin), name="dispatch")
 @method_decorator(
     cache_control(no_cache=True, no_store=True, must_revalidate=True), name="dispatch"
 )
 @method_decorator(condition(etag_func=None), name="dispatch")
-class SysadminDashboardView(TemplateView):
-    """View to show the Dashboard page of SysAdmin."""
+class SysadminDashboardBaseView(TemplateView):
+    """Base view for SysAdmin Dashboard's Panels."""
 
     template_name = "edx_sysadmin/base.html"
 
-    def __init__(self, **kwargs):
+    def get_context_data(self, **kwargs):
         """
-        Initialize base sysadmin dashboard class with modulestore,
-        modulestore_type and return msg
+        Overriding get_context_data method to add custom fields
         """
+        context = super().get_context_data(**kwargs)
+        context.update(
+            {
+                "show_users_tab": user_has_access_to_users_panel(self.request.user),
+                "show_courses_tab": user_has_access_to_courses_panel(self.request.user),
+                "show_git_logs_tab": user_has_access_to_git_logs_panel(
+                    self.request.user
+                ),
+                "show_git_import_tab": user_has_access_to_git_import_panel(
+                    self.request.user
+                ),
+            }
+        )
+        return context
 
-        self.def_ms = modulestore()
-        self.msg = ""
-        super().__init__(**kwargs)
 
-
-class CoursesPanel(SysadminDashboardView):
+@method_decorator(user_passes_test(user_has_access_to_courses_panel), name="dispatch")
+class CoursesPanel(SysadminDashboardBaseView):
     """
     This manages deleting courses.
     """
 
     template_name = "edx_sysadmin/courses.html"
 
+    def get_context_data(self, **kwargs):
+        """
+        Overriding get_context_data method to add custom fields
+        """
+        context = super().get_context_data(**kwargs)
+        context["is_courses_tab"] = True
+        return context
+
     def post(self, request):
         """Handle delete action from courses view"""
 
         action = request.POST.get("action", "")
+        message = ""
         if action == "del_course":
             course_id = request.POST.get("course_id", "").strip()
             course_key = CourseKey.from_string(course_id)
@@ -80,7 +123,7 @@ class CoursesPanel(SysadminDashboardView):
                 course = get_course_by_id(course_key)
                 course_found = True
             except Exception as err:  # pylint: disable=broad-except
-                self.msg += Text(
+                message += Text(
                     _(
                         "{div_start} Error - cannot get course with ID {course_key} {error} {div_end}"
                     )
@@ -95,9 +138,9 @@ class CoursesPanel(SysadminDashboardView):
 
             if course_found:
                 # delete course that is stored with mongodb backend
-                self.def_ms.delete_course(course.id, request.user.id)
+                modulestore().delete_course(course.id, request.user.id)
                 # don't delete user permission groups, though
-                self.msg += Text(
+                message += Text(
                     _(
                         "{font_start} Deleted {location} = {course_id} {course_name} {font_end}"
                     )
@@ -109,11 +152,13 @@ class CoursesPanel(SysadminDashboardView):
                     font_end=HTML("</font>"),
                 )
 
-        context = {"msg": self.msg}
+        context = self.get_context_data()
+        context.update({"msg": message})
         return render(request, self.template_name, context)
 
 
-class UsersPanel(SysadminDashboardView):
+@method_decorator(user_passes_test(user_has_access_to_users_panel), name="dispatch")
+class UsersPanel(SysadminDashboardBaseView):
     """View to show the User Panel of SysAdmin."""
 
     template_name = "edx_sysadmin/users.html"
@@ -129,8 +174,13 @@ class UsersPanel(SysadminDashboardView):
         if not is_registration_api_functional():
             context["disclaimer"] = True
 
-        context["user_registration_form"] = UserRegistrationForm(
-            initial_data, extra_fields=extra_fields
+        context.update(
+            {
+                "user_registration_form": UserRegistrationForm(
+                    initial_data, extra_fields=extra_fields
+                ),
+                "is_users_tab": True,
+            }
         )
         return context
 
@@ -154,12 +204,23 @@ class UsersPanel(SysadminDashboardView):
         return render(request, self.template_name, context)
 
 
-class GitImport(SysadminDashboardView):
+@method_decorator(
+    user_passes_test(user_has_access_to_git_import_panel), name="dispatch"
+)
+class GitImport(SysadminDashboardBaseView):
     """
-    This provide the view to load new course from github
+    This provide the view to load or update courses from github
     """
 
     template_name = "edx_sysadmin/gitimport.html"
+
+    def get_context_data(self, **kwargs):
+        """
+        Overriding get_context_data method to add custom fields
+        """
+        context = super().get_context_data(**kwargs)
+        context["is_git_import_tab"] = True
+        return context
 
     def get_course_from_git(self, gitloc, branch):
         """This downloads and runs the checks for importing a course in git"""
@@ -182,9 +243,9 @@ class GitImport(SysadminDashboardView):
         at debug level for display in template
         """
 
-        msg = u""
+        message = ""
 
-        log.debug(u"Adding course using git repo %s", gitloc)
+        log.debug("Adding course using git repo %s", gitloc)
 
         # Grab logging output for debugging imports
         output = StringIO()
@@ -193,7 +254,7 @@ class GitImport(SysadminDashboardView):
 
         logger_names = [
             "xmodule.modulestore.xml_importer",
-            "lms.djangoapps.dashboard.git_import",
+            "edx_sysadmin.git_import",
             "xmodule.modulestore.xml",
             "xmodule.seq_module",
         ]
@@ -224,16 +285,14 @@ class GitImport(SysadminDashboardView):
             msg_header = _("Added Course")
             color = "blue"
 
-        msg = HTML(u"<h4 style='color:{0}'>{1}</h4>").format(color, msg_header)
-        msg += HTML(u"<pre>{0}</pre>").format(escape(ret))
-        return msg
+        message = HTML("<h4 style='color:{0}'>{1}</h4>").format(color, msg_header)
+        message += HTML("<pre>{0}</pre>").format(escape(ret))
+        return message
 
     def post(self, request):
         """Handle all actions from courses view"""
 
-        if not request.user.is_staff:
-            raise Http404
-
+        message = ""
         action = request.POST.get("action", "")
 
         if action == "add_course":
@@ -249,13 +308,15 @@ class GitImport(SysadminDashboardView):
                 .replace(" ", "")
                 .replace(";", "")
             )
-            self.msg += self.get_course_from_git(gitloc, branch)
+            message += self.get_course_from_git(gitloc, branch)
 
-        context = {"msg": self.msg}
+        context = self.get_context_data()
+        context.update({"msg": message})
         return render(request, self.template_name, context)
 
 
-class GitLogs(SysadminDashboardView):
+@method_decorator(user_passes_test(user_has_access_to_git_logs_panel), name="dispatch")
+class GitLogs(SysadminDashboardBaseView):
     """
     This provides a view into the import of courses from git repositories.
     It is convenient for allowing course teams to see what may be wrong with
@@ -264,10 +325,16 @@ class GitLogs(SysadminDashboardView):
 
     template_name = "edx_sysadmin/gitlogs.html"
 
-    @method_decorator(login_required)
+    def get_context_data(self, **kwargs):
+        """
+        Overriding get_context_data method to add custom fields
+        """
+        context = super().get_context_data(**kwargs)
+        context["is_git_logs_tab"] = True
+        return context
+
     def get(self, request, *args, **kwargs):
         """Shows logs of imports that happened as a result of a git import"""
-
         course_id = kwargs.get("course_id")
         if course_id:
             course_id = CourseKey.from_string(course_id)
@@ -310,23 +377,27 @@ class GitLogs(SysadminDashboardView):
             )
 
         if course_id is None:
-            # Require staff if not going to specific course
             if not request.user.is_staff:
-                raise Http404
-            cilset = CourseImportLog.objects.order_by("-created")
+                user_courses = request.user.courseaccessrole_set.filter(
+                    role=CourseInstructorRole.ROLE
+                ).values_list("course_id", flat=True)
+                cilset = CourseImportLog.objects.filter(
+                    course_id__in=user_courses
+                ).order_by("-created")
+            else:
+                cilset = CourseImportLog.objects.order_by("-created")
         else:
-            # Allow only course team, instructors, and staff
+            # Allow only course-admin and staff users
             if not (
                 request.user.is_staff
                 or CourseInstructorRole(course_id).has_user(request.user)
-                or CourseStaffRole(course_id).has_user(request.user)
             ):
                 raise Http404
             log.debug("course_id=%s", course_id)
             cilset = CourseImportLog.objects.filter(course_id=course_id).order_by(
                 "-created"
             )
-            log.debug(u"cilset length=%s", len(cilset))
+            log.debug("cilset length=%s", len(cilset))
 
         # Paginate the query set
         paginator = Paginator(cilset, page_size)
@@ -341,11 +412,14 @@ class GitLogs(SysadminDashboardView):
             logs = paginator.page(page)
 
         mdb.close()
-        context = {
-            "logs": logs,
-            "course_id": course_id if course_id else None,
-            "error_msg": error_msg,
-            "page_size": page_size,
-        }
+        context = self.get_context_data(**kwargs)
+        context.update(
+            {
+                "logs": logs,
+                "course_id": course_id if course_id else None,
+                "error_msg": error_msg,
+                "page_size": page_size,
+            }
+        )
 
         return render(request, self.template_name, context)
