@@ -61,4 +61,5 @@ requirements/private.in
 requirements/private.txt
 
 # IDE related
-.idea/*
+.idea/
+.vscode/
