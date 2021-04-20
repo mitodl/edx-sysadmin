@@ -62,7 +62,7 @@ class SysadminBaseTestCase(SharedModuleStoreTestCase):
         }
         if branch:
             post_dict["repo_branch"] = branch
-        return self.client.post(reverse("sysadmin_courses"), post_dict)
+        return self.client.post(reverse("sysadmin:gitimport"), post_dict)
 
     def _rm_edx4edx(self):
         """Deletes the sample course from the XML store"""
@@ -76,16 +76,19 @@ class SysadminBaseTestCase(SharedModuleStoreTestCase):
             course = def_ms.get_course(CourseLocator("MITx", "edx4edx", "edx4edx"))
 
         # Delete git loaded course
-        response = self.client.post(
-            reverse("sysadmin_courses"),
-            {
-                "course_id": str(course.id),
-                "action": "del_course",
-            },
-        )
-        self.addCleanup(self._rm_glob, f"{course_path}_deleted_*")
+        if course:
+            response = self.client.post(
+                reverse("sysadmin:courses"),
+                {
+                    "course_id": str(course.id),
+                    "action": "del_course",
+                },
+            )
+            self.addCleanup(self._rm_glob, f"{course_path}_deleted_*")
 
-        return response
+            return response
+        else:
+            return None
 
     def _rm_glob(self, path):
         """
@@ -106,7 +109,7 @@ class SysadminBaseTestCase(SharedModuleStoreTestCase):
 
 
 @override_settings(
-    GIT_REPO_DIR=settings.TEST_ROOT / f"course_repos_{uuid4().hex}",
+    GIT_REPO_DIR="/edx-sysadmin" / settings.TEST_ROOT / f"course_repos_{uuid4().hex}",
 )
 class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
     """
@@ -129,7 +132,6 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         self.client.login(username=self.user.username, password="foo")
 
-    @pytest.mark.skip(reason="FIXME: Refactor needed for the test")
     def test_missing_repo_dir(self):
         """
         Ensure that we handle a missing repo dir
@@ -146,7 +148,6 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
             response, Text(str(GitImportErrorNoDir(settings.GIT_REPO_DIR)))
         )
 
-    @pytest.mark.skip(reason="FIXME: Refactor needed for the test")
     def test_mongo_course_add_delete(self):
         """
         This is the same as TestSysadmin.test_xml_course_add_delete,
@@ -195,7 +196,6 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         response = self._add_edx4edx()
         self.assertRegex(response.content.decode("utf-8"), table_re)
 
-    @pytest.mark.skip(reason="FIXME: Refactor needed for the test")
     def test_gitlogs(self):
         """
         Create a log entry and make sure it exists
@@ -205,14 +205,15 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         self._mkdir(settings.GIT_REPO_DIR)
 
         self._add_edx4edx()
-        response = self.client.get(reverse("gitlogs"))
+        response = self.client.get(reverse("sysadmin:gitlogs"))
 
         # Check that our earlier import has a log with a link to details
         self.assertContains(response, "/gitlogs/course-v1:MITx+edx4edx+edx4edx")
 
         response = self.client.get(
             reverse(
-                "gitlogs_detail", kwargs={"course_id": "course-v1:MITx+edx4edx+edx4edx"}
+                "sysadmin:gitlogs_detail",
+                kwargs={"course_id": "course-v1:MITx+edx4edx+edx4edx"},
             )
         )
 
@@ -220,7 +221,6 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         self._rm_edx4edx()
 
-    @pytest.mark.skip(reason="FIXME: Refactor needed for the test")
     def test_gitlog_date(self):
         """
         Make sure the date is timezone-aware and being converted/formatted
@@ -240,33 +240,31 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         self._mkdir(settings.GIT_REPO_DIR)
 
         self._add_edx4edx()
-        date = CourseGitLog.objects.first().created.replace(tzinfo=UTC)
+        date = CourseGitLog.objects.all().first().created.replace(tzinfo=UTC)
 
         for timezone in tz_names:
             with (
                 override_settings(TIME_ZONE=timezone)
             ):  # lint-amnesty, pylint: disable=superfluous-parens
                 date_text = get_time_display(date, tz_format, settings.TIME_ZONE)
-                response = self.client.get(reverse("gitlogs"))
+                response = self.client.get(reverse("sysadmin:gitlogs"))
                 self.assertContains(response, date_text)
 
         self._rm_edx4edx()
 
-    @pytest.mark.skip(reason="FIXME: Refactor needed for the test")
     def test_gitlog_bad_course(self):
         """
         Make sure we gracefully handle courses that don't exist.
         """
         self._setstaff_login()
         response = self.client.get(
-            reverse("gitlogs_detail", kwargs={"course_id": "Not/Real/Testing"})
+            reverse("sysadmin:gitlogs_detail", kwargs={"course_id": "Not/Real/Testing"})
         )
         self.assertContains(
             response,
             "No git import logs have been recorded for this course.",
         )
 
-    @pytest.mark.skip(reason="FIXME: Refactor needed for the test")
     def test_gitlog_no_logs(self):
         """
         Make sure the template behaves well when rendered despite there not being any logs.
@@ -284,16 +282,17 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         response = self.client.get(
             reverse(
-                "gitlogs_detail", kwargs={"course_id": "course-v1:MITx+edx4edx+edx4edx"}
+                "sysadmin:gitlogs_detail",
+                kwargs={"course_id": "course-v1:MITx+edx4edx+edx4edx"},
             )
         )
+
         self.assertContains(
             response, "No git import logs have been recorded for this course."
         )
 
         self._rm_edx4edx()
 
-    @pytest.mark.skip(reason="FIXME: Refactor needed for the test")
     def test_gitlog_pagination_out_of_range_invalid(self):
         """
         Make sure the pagination behaves properly when the requested page is out
@@ -312,12 +311,13 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
             ).save()
 
         for page, expected in [(-1, 1), (1, 1), (2, 2), (30, 2), ("abc", 1)]:
-            response = self.client.get("{}?page={}".format(reverse("gitlogs"), page))
+            response = self.client.get(
+                "{}?page={}".format(reverse("sysadmin:gitlogs"), page)
+            )
             self.assertContains(response, f"Page {expected} of 2")
 
-        CourseGitLog.objects.delete()
+        CourseGitLog.objects.all().delete()
 
-    @pytest.mark.skip(reason="no way of currently testing this")
     def test_gitlog_courseteam_access(self):
         """
         Ensure course team users are allowed to access only their own course.
@@ -329,19 +329,25 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         self._add_edx4edx()
         self.user.is_staff = False
         self.user.save()
+        self.user.courseaccessrole_set.all().delete()
         logged_in = self.client.login(username=self.user.username, password="foo")
-        response = self.client.get(reverse("gitlogs"))
+        response = self.client.get(reverse("sysadmin:gitlogs"))
         # Make sure our non privileged user doesn't have access to all logs
-        assert response.status_code == 404
+        assert response.status_code == 302
+        assert response.url == "/404"
         # Or specific logs
         response = self.client.get(
             reverse(
-                "gitlogs_detail", kwargs={"course_id": "course-v1:MITx+edx4edx+edx4edx"}
+                "sysadmin:gitlogs_detail",
+                kwargs={"course_id": "course-v1:MITx+edx4edx+edx4edx"},
             )
         )
-        assert response.status_code == 404
+        assert response.status_code == 302
+        assert response.url == "/404"
 
         # Add user as staff in course team
+        self.user.is_staff = True
+        self.user.save()
         def_ms = modulestore()
         course = def_ms.get_course(CourseLocator("MITx", "edx4edx", "edx4edx"))
         CourseStaffRole(course.id).add_users(self.user)
@@ -352,9 +358,12 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         response = self.client.get(
             reverse(
-                "gitlogs_detail", kwargs={"course_id": "course-v1:MITx+edx4edx+edx4edx"}
+                "sysadmin:gitlogs_detail",
+                kwargs={"course_id": "course-v1:MITx+edx4edx+edx4edx"},
             )
         )
+        print(response.__dict__)
+        print(response)
         self.assertContains(response, "======&gt; IMPORTING course")
 
         self._rm_edx4edx()

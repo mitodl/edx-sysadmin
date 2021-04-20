@@ -18,13 +18,21 @@ jobs:
       - name: Run black formatter
         run: black --check .
 
-      - name: Setup edX & Run Tests
+      - name: Setup edX
         run: |
           cd ..
           git clone https://github.com/edx/devstack.git
           cd devstack
           sed -i 's/:cached//g' ./docker-compose-host.yml
           make dev.clone.https
+          cd ../edx-platform
+          git remote add mitodl https://github.com/mitodl/edx-platform.git
+          git fetch mitodl
+          git checkout mitodl/mitx/lilac
+
+      - name: Run tests
+        run: |
+          cd ../devstack
           DEVSTACK_WORKSPACE=$PWD/.. docker-compose -f docker-compose.yml -f docker-compose-host.yml run -v $PWD/../edx-sysadmin:/edx-sysadmin lms /edx-sysadmin/run_devstack_integration_tests.sh
 
       - name: Upload coverage to CodeCov
