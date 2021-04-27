@@ -9,7 +9,6 @@ import os
 import re
 import subprocess
 
-import mongoengine
 from django.conf import settings
 from django.core import management
 from django.core.management.base import CommandError
@@ -20,7 +19,7 @@ from six import StringIO
 
 from xmodule.util.sandboxing import DEFAULT_PYTHON_LIB_FILENAME
 
-from edx_sysadmin.models import CourseImportLog
+from edx_sysadmin.models import CourseGitLog
 
 
 log = logging.getLogger(__name__)
@@ -236,22 +235,6 @@ def add_repo(repo, rdir_in, branch=None):
         settings, "PYTHON_LIB_FILENAME", DEFAULT_PYTHON_LIB_FILENAME
     )
 
-    # Set defaults even if it isn't defined in settings
-    mongo_db = {
-        "host": "localhost",
-        "port": 27017,
-        "user": "",
-        "password": "",
-        "db": "xlog",
-    }
-
-    # Allow overrides
-    if hasattr(settings, "MONGODB_LOG"):
-        for config_item in ["host", "user", "password", "db", "port"]:
-            mongo_db[config_item] = settings.MONGODB_LOG.get(
-                config_item, mongo_db[config_item]
-            )
-
     if not os.path.isdir(git_repo_dir):
         raise GitImportErrorNoDir(git_repo_dir)
     # pull from git
@@ -365,7 +348,6 @@ def add_repo(repo, rdir_in, branch=None):
         logger.removeHandler(import_log_handler)
 
     course_key = None
-    location = "unknown"
 
     # extract course ID from output of import-command-run and make symlink
     # this is needed in order for custom course scripts to work
@@ -375,7 +357,7 @@ def add_repo(repo, rdir_in, branch=None):
         # we need to transform course key extracted from logs into CourseLocator instance, because
         # we are using split module store and course keys store as instance of CourseLocator.
         # please see common.lib.xmodule.xmodule.modulestore.split_mongo.split.SplitMongoModuleStore#make_course_key
-        # We want set course id in CourseImportLog as CourseLocator. So that in split module
+        # We want set course id in CourseGitLog as CourseLocator. So that in split module
         # environment course id remain consistent as CourseLocator instance.
         course_key = CourseLocator(*course_id)
         cdir = "{0}/{1}".format(git_repo_dir, course_key.course)
@@ -413,30 +395,13 @@ def add_repo(repo, rdir_in, branch=None):
                 )
             )
 
-    # store import-command-run output in mongo
-    mongouri = "mongodb://{user}:{password}@{host}:{port}/{db}".format(**mongo_db)
-
-    try:
-        if mongo_db["user"] and mongo_db["password"]:
-            mdb = mongoengine.connect(mongo_db["db"], host=mongouri)
-        else:
-            mdb = mongoengine.connect(
-                mongo_db["db"], host=mongo_db["host"], port=mongo_db["port"]
-            )
-    except mongoengine.connection.ConnectionFailure:
-        log.exception(
-            "Unable to connect to mongodb to save log, please "
-            "check MONGODB_LOG settings"
-        )
-    cil = CourseImportLog(
+    cgl = CourseGitLog(
         course_id=course_key,
-        location=location,
         repo_dir=rdir,
         created=timezone.now(),
-        import_log=ret_import,
+        course_import_log=ret_import,
         git_log=ret_git,
     )
-    cil.save()
+    cgl.save()
 
-    log.debug(u"saved CourseImportLog for %s", cil.course_id)
-    mdb.close()
+    log.debug(u"saved CourseGitLog for %s", cgl.course_id)

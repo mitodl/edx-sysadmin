@@ -18,7 +18,6 @@ from six import StringIO
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
 
 from edx_sysadmin import git_import
 from edx_sysadmin.git_import import (
@@ -31,17 +30,7 @@ from edx_sysadmin.git_import import (
 )
 
 
-TEST_MONGODB_LOG = {
-    "host": MONGO_HOST,
-    "port": MONGO_PORT_NUM,
-    "user": "",
-    "password": "",
-    "db": "test_xlog",
-}
-
-
 @override_settings(
-    MONGODB_LOG=TEST_MONGODB_LOG,
     GIT_REPO_DIR=settings.TEST_ROOT / "course_repos_{}".format(uuid4().hex),
 )
 class TestGitAddCourse(SharedModuleStoreTestCase):

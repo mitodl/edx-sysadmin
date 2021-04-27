@@ -5,7 +5,7 @@
 
 
 {% block headextra %}
-{{ block.super }} 
+{{ block.super }}
 <script>
     $(function() {
         $(".toggle-import-log").click(function(e) {
@@ -73,7 +73,7 @@
                 {# Show the full log of the latest import if viewing logs for a specific course #}
                 {% if course_id is not None %}
                 <tr class="import-log" id="import-log-{{forloop.counter0}}">
-                    <td colspan="3"><pre>{{cil.import_log}}</pre>
+                    <td colspan="3"><pre>{{cil.course_import_log}}</pre>
                     </td>
                 </tr>
                 {% endif %}

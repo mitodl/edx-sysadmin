@@ -8,7 +8,6 @@ import shutil
 from datetime import datetime
 from uuid import uuid4
 
-import mongoengine
 import pytest
 from django.conf import settings
 from django.test.client import Client
@@ -21,22 +20,13 @@ from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_SPLIT_MODULESTORE,
     SharedModuleStoreTestCase,
 )
-from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
 
 from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.date_utils import DEFAULT_DATE_TIME_FORMAT, get_time_display
 from edx_sysadmin.git_import import GitImportErrorNoDir
-from edx_sysadmin.models import CourseImportLog
+from edx_sysadmin.models import CourseGitLog
 from openedx.core.djangolib.markup import Text
-
-TEST_MONGODB_LOG = {
-    "host": MONGO_HOST,
-    "port": MONGO_PORT_NUM,
-    "user": "",
-    "password": "",
-    "db": "test_xlog",
-}
 
 
 class SysadminBaseTestCase(SharedModuleStoreTestCase):
@@ -116,7 +106,6 @@ class SysadminBaseTestCase(SharedModuleStoreTestCase):
 
 
 @override_settings(
-    MONGODB_LOG=TEST_MONGODB_LOG,
     GIT_REPO_DIR=settings.TEST_ROOT / f"course_repos_{uuid4().hex}",
 )
 class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
@@ -128,11 +117,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
     def tearDownClass(cls):
         """Delete mongo log entries after test."""
         super().tearDownClass()
-        try:
-            mongoengine.connect(TEST_MONGODB_LOG["db"])
-            CourseImportLog.objects.all().delete()
-        except mongoengine.connection.ConnectionFailure:
-            pass
+        CourseGitLog.objects.all().delete()
 
     def _setstaff_login(self):
         """
@@ -255,7 +240,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         self._mkdir(settings.GIT_REPO_DIR)
 
         self._add_edx4edx()
-        date = CourseImportLog.objects.first().created.replace(tzinfo=UTC)
+        date = CourseGitLog.objects.first().created.replace(tzinfo=UTC)
 
         for timezone in tz_names:
             with (
@@ -294,7 +279,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         self._add_edx4edx()
 
         # Simulate a lack of git import logs
-        import_logs = CourseImportLog.objects.all()
+        import_logs = CourseGitLog.objects.all()
         import_logs.delete()
 
         response = self.client.get(
@@ -317,13 +302,10 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         self._setstaff_login()
 
-        mongoengine.connect(TEST_MONGODB_LOG["db"])
-
         for _ in range(15):
-            CourseImportLog(
+            CourseGitLog(
                 course_id=CourseLocator.from_string("test/test/test"),
-                location="location",
-                import_log="import_log",
+                course_import_log="import_log",
                 git_log="git_log",
                 repo_dir="repo_dir",
                 created=datetime.now(),
@@ -333,7 +315,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
             response = self.client.get("{}?page={}".format(reverse("gitlogs"), page))
             self.assertContains(response, f"Page {expected} of 2")
 
-        CourseImportLog.objects.delete()
+        CourseGitLog.objects.delete()
 
     @pytest.mark.skip(reason="no way of currently testing this")
     def test_gitlog_courseteam_access(self):

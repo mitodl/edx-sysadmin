@@ -1,23 +1,19 @@
 """
 Database models for edx_sysadmin.
 """
+from django.db import models
+from jsonfield.fields import JSONField
 
-import mongoengine
-
-from xmodule.modulestore.mongoengine_fields import CourseKeyField
+from opaque_keys.edx.django.models import CourseKeyField
 
 
-class CourseImportLog(mongoengine.Document):
-    """Mongoengine model for git log"""
+class CourseGitLog(models.Model):
+    """CourseGitLog to store git-logs of courses imported from github"""
 
-    course_id = CourseKeyField(max_length=128)
-    # NOTE: this location is not a Location object but a pathname
-    location = mongoengine.StringField(max_length=168)
-    import_log = mongoengine.StringField(max_length=20 * 65535)
-    git_log = mongoengine.StringField(max_length=65535)
-    repo_dir = mongoengine.StringField(max_length=128)
-    commit = mongoengine.StringField(max_length=40, null=True)
-    author = mongoengine.StringField(max_length=500, null=True)
-    date = mongoengine.DateTimeField()
-    created = mongoengine.DateTimeField()
-    meta = {"indexes": ["course_id", "created"], "allow_inheritance": False}
+    course_id = CourseKeyField(max_length=255, db_index=True)
+    course_import_log = JSONField(null=True, blank=True)
+    git_log = models.TextField(null=True, blank=True)
+    repo_dir = models.CharField(max_length=255)
+    commit = models.CharField(max_length=40, null=True)
+    author = models.CharField(max_length=255)
+    created = models.DateTimeField(auto_now_add=True, null=True)
