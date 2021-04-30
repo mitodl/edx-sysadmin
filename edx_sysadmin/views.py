@@ -1,13 +1,13 @@
 """
 Views for the Open edX SysAdmin Plugin
 """
-import logging
-
 from io import StringIO
+import logging
 import mongoengine
-from django.contrib.auth.decorators import user_passes_test
+
 from django.conf import settings
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+
 from django.http import Http404
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
@@ -23,6 +23,7 @@ from opaque_keys.edx.keys import CourseKey
 from common.djangoapps.student.roles import CourseInstructorRole
 from xmodule.modulestore.django import modulestore
 
+from edx_sysadmin.decorators import check_access
 from edx_sysadmin.git_import import GitImportError
 from edx_sysadmin import git_import
 from edx_sysadmin.forms import UserRegistrationForm
@@ -44,7 +45,7 @@ from edx_sysadmin.utils.utils import (
 log = logging.getLogger(__name__)
 
 
-@method_decorator(user_passes_test(user_has_access_to_sysadmin), name="dispatch")
+@method_decorator(check_access(user_has_access_to_sysadmin), name="dispatch")
 class SysadminDashboardRedirectionView(RedirectView):
     """Redirection view to land user to specific panel"""
 
@@ -64,7 +65,7 @@ class SysadminDashboardRedirectionView(RedirectView):
 
 
 @method_decorator(ensure_csrf_cookie, name="dispatch")
-@method_decorator(user_passes_test(user_has_access_to_sysadmin), name="dispatch")
+@method_decorator(check_access(user_has_access_to_sysadmin), name="dispatch")
 @method_decorator(
     cache_control(no_cache=True, no_store=True, must_revalidate=True), name="dispatch"
 )
@@ -94,7 +95,7 @@ class SysadminDashboardBaseView(TemplateView):
         return context
 
 
-@method_decorator(user_passes_test(user_has_access_to_courses_panel), name="dispatch")
+@method_decorator(check_access(user_has_access_to_courses_panel), name="dispatch")
 class CoursesPanel(SysadminDashboardBaseView):
     """
     This manages deleting courses.
@@ -157,7 +158,7 @@ class CoursesPanel(SysadminDashboardBaseView):
         return render(request, self.template_name, context)
 
 
-@method_decorator(user_passes_test(user_has_access_to_users_panel), name="dispatch")
+@method_decorator(check_access(user_has_access_to_users_panel), name="dispatch")
 class UsersPanel(SysadminDashboardBaseView):
     """View to show the User Panel of SysAdmin."""
 
@@ -204,9 +205,7 @@ class UsersPanel(SysadminDashboardBaseView):
         return render(request, self.template_name, context)
 
 
-@method_decorator(
-    user_passes_test(user_has_access_to_git_import_panel), name="dispatch"
-)
+@method_decorator(check_access(user_has_access_to_git_import_panel), name="dispatch")
 class GitImport(SysadminDashboardBaseView):
     """
     This provide the view to load or update courses from github
@@ -315,7 +314,7 @@ class GitImport(SysadminDashboardBaseView):
         return render(request, self.template_name, context)
 
 
-@method_decorator(user_passes_test(user_has_access_to_git_logs_panel), name="dispatch")
+@method_decorator(check_access(user_has_access_to_git_logs_panel), name="dispatch")
 class GitLogs(SysadminDashboardBaseView):
     """
     This provides a view into the import of courses from git repositories.
