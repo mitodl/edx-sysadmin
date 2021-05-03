@@ -44,7 +44,12 @@ from edx_sysadmin.utils.utils import (
 log = logging.getLogger(__name__)
 
 
-@method_decorator(user_passes_test(user_has_access_to_sysadmin), name="dispatch")
+@method_decorator(
+    user_passes_test(
+        user_has_access_to_sysadmin, login_url="/404", redirect_field_name=None
+    ),
+    name="dispatch",
+)
 class SysadminDashboardRedirectionView(RedirectView):
     """Redirection view to land user to specific panel"""
 
@@ -64,7 +69,12 @@ class SysadminDashboardRedirectionView(RedirectView):
 
 
 @method_decorator(ensure_csrf_cookie, name="dispatch")
-@method_decorator(user_passes_test(user_has_access_to_sysadmin), name="dispatch")
+@method_decorator(
+    user_passes_test(
+        user_has_access_to_sysadmin, login_url="/404", redirect_field_name=None
+    ),
+    name="dispatch",
+)
 @method_decorator(
     cache_control(no_cache=True, no_store=True, must_revalidate=True), name="dispatch"
 )
@@ -94,7 +104,12 @@ class SysadminDashboardBaseView(TemplateView):
         return context
 
 
-@method_decorator(user_passes_test(user_has_access_to_courses_panel), name="dispatch")
+@method_decorator(
+    user_passes_test(
+        user_has_access_to_courses_panel, login_url="/404", redirect_field_name=None
+    ),
+    name="dispatch",
+)
 class CoursesPanel(SysadminDashboardBaseView):
     """
     This manages deleting courses.
@@ -157,7 +172,12 @@ class CoursesPanel(SysadminDashboardBaseView):
         return render(request, self.template_name, context)
 
 
-@method_decorator(user_passes_test(user_has_access_to_users_panel), name="dispatch")
+@method_decorator(
+    user_passes_test(
+        user_has_access_to_users_panel, login_url="/404", redirect_field_name=None
+    ),
+    name="dispatch",
+)
 class UsersPanel(SysadminDashboardBaseView):
     """View to show the User Panel of SysAdmin."""
 
@@ -205,7 +225,10 @@ class UsersPanel(SysadminDashboardBaseView):
 
 
 @method_decorator(
-    user_passes_test(user_has_access_to_git_import_panel), name="dispatch"
+    user_passes_test(
+        user_has_access_to_git_import_panel, login_url="/404", redirect_field_name=None
+    ),
+    name="dispatch",
 )
 class GitImport(SysadminDashboardBaseView):
     """
@@ -315,7 +338,12 @@ class GitImport(SysadminDashboardBaseView):
         return render(request, self.template_name, context)
 
 
-@method_decorator(user_passes_test(user_has_access_to_git_logs_panel), name="dispatch")
+@method_decorator(
+    user_passes_test(
+        user_has_access_to_git_logs_panel, login_url="/404", redirect_field_name=None
+    ),
+    name="dispatch",
+)
 class GitLogs(SysadminDashboardBaseView):
     """
     This provides a view into the import of courses from git repositories.
