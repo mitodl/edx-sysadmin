@@ -24,6 +24,7 @@ from openedx.core.djangoapps.user_authn.toggles import (
 )
 from xmodule.modulestore.django import modulestore
 
+from edx_sysadmin.models import CourseGitLog
 from edx_sysadmin.utils.markup import HTML, Text
 
 
@@ -399,3 +400,26 @@ def user_has_access_to_git_import_panel(user):
     if user and user.is_staff:
         return True
     return False
+
+
+def remove_old_course_import_logs(course_id):
+    """
+    Removes old CourseGitLog if the log count increases the settings.SYSADMIN_MAX_GIT_LOGS_THRESHOLD
+    :param course_id: CourseLocation object to target specific logs
+    :return int: Count of deleted logs if anything gets deleted else 0
+    """
+    if hasattr(settings, "SYSADMIN_MAX_GIT_LOGS_THRESHOLD") and isinstance(
+        settings.SYSADMIN_MAX_GIT_LOGS_THRESHOLD, int
+    ):
+        threshold = settings.SYSADMIN_MAX_GIT_LOGS_THRESHOLD
+        deletion_count, _ = CourseGitLog.objects.filter(
+            id__in=list(
+                CourseGitLog.objects.filter(course_id=course_id)
+                .order_by("-created")
+                .values_list("id", flat=True)[threshold:]
+            )
+        ).delete()
+
+        return deletion_count
+    else:
+        return 0
