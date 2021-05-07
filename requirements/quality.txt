@@ -9,7 +9,7 @@ appdirs==1.4.4
     #   -r requirements/test.txt
     #   black
     #   virtualenv
-astroid==2.5.1
+astroid==2.5.6
     # via
     #   pylint
     #   pylint-celery
@@ -17,7 +17,7 @@ attrs==20.3.0
     # via
     #   -r requirements/test.txt
     #   pytest
-black==20.8b1
+black==21.5b0
     # via -r requirements/quality.in
 bleach==3.3.0
     # via readme-renderer
@@ -34,7 +34,7 @@ click==7.1.2
     #   click-log
     #   code-annotations
     #   edx-lint
-code-annotations==1.1.0
+code-annotations==1.1.1
     # via
     #   -r requirements/test.txt
     #   edx-lint
@@ -48,15 +48,17 @@ distlib==0.3.1
     # via
     #   -r requirements/test.txt
     #   virtualenv
-django==2.2.19
+django==2.2.21
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/test.txt
     #   code-annotations
     #   edx-lint
 docutils==0.16
-    # via readme-renderer
-edx-lint==4.1.1
+    # via
+    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
+    #   readme-renderer
+edx-lint==5.0.0
     # via -r requirements/quality.in
 filelock==3.0.12
     # via
@@ -65,23 +67,29 @@ filelock==3.0.12
     #   virtualenv
 idna==2.10
     # via requests
-importlib-metadata==3.7.3
+importlib-metadata==4.0.1
     # via
+    #   -r requirements/test.txt
     #   keyring
+    #   pluggy
+    #   pytest
+    #   stevedore
+    #   tox
     #   twine
+    #   virtualenv
 iniconfig==1.1.1
     # via
     #   -r requirements/test.txt
     #   pytest
-isort==5.7.0
+isort==5.8.0
     # via pylint
 jinja2==2.11.3
     # via
     #   -r requirements/test.txt
     #   code-annotations
-keyring==23.0.0
+keyring==23.0.1
     # via twine
-lazy-object-proxy==1.5.2
+lazy-object-proxy==1.6.0
     # via astroid
 markupsafe==1.1.1
     # via
@@ -99,7 +107,7 @@ packaging==20.9
     #   tox
 pathspec==0.8.1
     # via black
-pbr==5.5.1
+pbr==5.6.0
     # via
     #   -r requirements/test.txt
     #   stevedore
@@ -117,19 +125,19 @@ py==1.10.0
     #   tox
 pycodestyle==2.7.0
     # via -r requirements/quality.in
-pydocstyle==5.1.1
+pydocstyle==6.0.0
     # via -r requirements/quality.in
-pygments==2.8.1
+pygments==2.9.0
     # via readme-renderer
 pylint-celery==0.3
     # via edx-lint
-pylint-django==2.4.2
+pylint-django==2.4.4
     # via edx-lint
 pylint-plugin-utils==0.6
     # via
     #   pylint-celery
     #   pylint-django
-pylint==2.7.2
+pylint==2.8.2
     # via
     #   edx-lint
     #   pylint-celery
@@ -141,14 +149,14 @@ pyparsing==2.4.7
     #   packaging
 pytest-cov==2.11.1
     # via -r requirements/test.txt
-pytest-django==4.1.0
+pytest-django==4.2.0
     # via -r requirements/test.txt
-pytest==6.2.2
+pytest==6.2.4
     # via
     #   -r requirements/test.txt
     #   pytest-cov
     #   pytest-django
-python-slugify==4.0.1
+python-slugify==5.0.0
     # via
     #   -r requirements/test.txt
     #   code-annotations
@@ -162,7 +170,7 @@ pyyaml==5.4.1
     #   code-annotations
 readme-renderer==29.0
     # via twine
-regex==2021.3.17
+regex==2021.4.4
     # via black
 requests-toolbelt==0.9.1
     # via twine
@@ -203,23 +211,32 @@ toml==0.10.2
     #   tox
 tox==3.23.0
     # via -r requirements/test.txt
-tqdm==4.59.0
+tqdm==4.60.0
     # via twine
 twine==3.4.1
     # via -r requirements/quality.in
-typed-ast==1.4.2
-    # via black
-typing-extensions==3.7.4.3
-    # via black
+typed-ast==1.4.3
+    # via
+    #   astroid
+    #   black
+typing-extensions==3.10.0.0
+    # via
+    #   -r requirements/test.txt
+    #   black
+    #   importlib-metadata
 urllib3==1.26.4
     # via requests
-virtualenv==20.4.3
+virtualenv==20.4.4
     # via
     #   -r requirements/test.txt
     #   tox
 webencodings==0.5.1
     # via bleach
+wheel==0.36.2
+    # via -r requirements/test.txt
 wrapt==1.12.1
     # via astroid
 zipp==3.4.1
-    # via importlib-metadata
+    # via
+    #   -r requirements/test.txt
+    #   importlib-metadata

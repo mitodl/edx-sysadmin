@@ -14,7 +14,7 @@ attrs==20.3.0
     # via
     #   -r requirements/test.txt
     #   pytest
-babel==2.9.0
+babel==2.9.1
     # via sphinx
 bleach==3.3.0
     # via readme-renderer
@@ -28,7 +28,7 @@ click==7.1.2
     # via
     #   -r requirements/test.txt
     #   code-annotations
-code-annotations==1.1.0
+code-annotations==1.1.1
     # via -r requirements/test.txt
 coverage==5.5
     # via
@@ -38,7 +38,7 @@ distlib==0.3.1
     # via
     #   -r requirements/test.txt
     #   virtualenv
-django==2.2.19
+django==2.2.21
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/test.txt
@@ -47,11 +47,12 @@ doc8==0.8.1
     # via -r requirements/doc.in
 docutils==0.16
     # via
+    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   doc8
     #   readme-renderer
     #   restructuredtext-lint
     #   sphinx
-edx-sphinx-theme==2.0.0
+edx-sphinx-theme==2.1.0
     # via -r requirements/doc.in
 filelock==3.0.12
     # via
@@ -62,6 +63,14 @@ idna==2.10
     # via requests
 imagesize==1.2.0
     # via sphinx
+importlib-metadata==4.0.1
+    # via
+    #   -r requirements/test.txt
+    #   pluggy
+    #   pytest
+    #   stevedore
+    #   tox
+    #   virtualenv
 iniconfig==1.1.1
     # via
     #   -r requirements/test.txt
@@ -82,7 +91,7 @@ packaging==20.9
     #   pytest
     #   sphinx
     #   tox
-pbr==5.5.1
+pbr==5.6.0
     # via
     #   -r requirements/test.txt
     #   stevedore
@@ -96,7 +105,7 @@ py==1.10.0
     #   -r requirements/test.txt
     #   pytest
     #   tox
-pygments==2.8.1
+pygments==2.9.0
     # via
     #   doc8
     #   readme-renderer
@@ -107,14 +116,14 @@ pyparsing==2.4.7
     #   packaging
 pytest-cov==2.11.1
     # via -r requirements/test.txt
-pytest-django==4.1.0
+pytest-django==4.2.0
     # via -r requirements/test.txt
-pytest==6.2.2
+pytest==6.2.4
     # via
     #   -r requirements/test.txt
     #   pytest-cov
     #   pytest-django
-python-slugify==4.0.1
+python-slugify==5.0.0
     # via
     #   -r requirements/test.txt
     #   code-annotations
@@ -144,7 +153,7 @@ six==1.15.0
     #   virtualenv
 snowballstemmer==2.1.0
     # via sphinx
-sphinx==3.5.2
+sphinx==3.5.4
     # via
     #   -r requirements/doc.in
     #   edx-sphinx-theme
@@ -180,14 +189,24 @@ toml==0.10.2
     #   tox
 tox==3.23.0
     # via -r requirements/test.txt
+typing-extensions==3.10.0.0
+    # via
+    #   -r requirements/test.txt
+    #   importlib-metadata
 urllib3==1.26.4
     # via requests
-virtualenv==20.4.3
+virtualenv==20.4.4
     # via
     #   -r requirements/test.txt
     #   tox
 webencodings==0.5.1
     # via bleach
+wheel==0.36.2
+    # via -r requirements/test.txt
+zipp==3.4.1
+    # via
+    #   -r requirements/test.txt
+    #   importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

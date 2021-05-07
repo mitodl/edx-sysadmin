@@ -10,7 +10,7 @@ appdirs==1.4.4
     #   -r requirements/quality.txt
     #   black
     #   virtualenv
-astroid==2.5.1
+astroid==2.5.6
     # via
     #   -r requirements/quality.txt
     #   pylint
@@ -19,7 +19,7 @@ attrs==20.3.0
     # via
     #   -r requirements/quality.txt
     #   pytest
-black==20.8b1
+black==21.5b0
     # via -r requirements/quality.txt
 bleach==3.3.0
     # via
@@ -49,7 +49,7 @@ click==7.1.2
     #   code-annotations
     #   edx-lint
     #   pip-tools
-code-annotations==1.1.0
+code-annotations==1.1.1
     # via
     #   -r requirements/quality.txt
     #   edx-lint
@@ -72,7 +72,7 @@ distlib==0.3.1
     #   -r requirements/ci.txt
     #   -r requirements/quality.txt
     #   virtualenv
-django==2.2.19
+django==2.2.21
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/quality.txt
@@ -81,11 +81,12 @@ django==2.2.19
     #   edx-lint
 docutils==0.16
     # via
+    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/quality.txt
     #   readme-renderer
 edx-i18n-tools==0.5.3
     # via -r requirements/dev.in
-edx-lint==4.1.1
+edx-lint==5.0.0
     # via -r requirements/quality.txt
 filelock==3.0.12
     # via
@@ -98,18 +99,26 @@ idna==2.10
     #   -r requirements/ci.txt
     #   -r requirements/quality.txt
     #   requests
-importlib-metadata==3.7.3
+importlib-metadata==4.0.1
     # via
+    #   -r requirements/ci.txt
+    #   -r requirements/pip-tools.txt
     #   -r requirements/quality.txt
     #   keyring
+    #   pep517
+    #   pluggy
+    #   pytest
+    #   stevedore
+    #   tox
     #   twine
+    #   virtualenv
 inflect==5.3.0
     # via jinja2-pluralize
 iniconfig==1.1.1
     # via
     #   -r requirements/quality.txt
     #   pytest
-isort==5.7.0
+isort==5.8.0
     # via
     #   -r requirements/quality.txt
     #   pylint
@@ -121,11 +130,11 @@ jinja2==2.11.3
     #   code-annotations
     #   diff-cover
     #   jinja2-pluralize
-keyring==23.0.0
+keyring==23.0.1
     # via
     #   -r requirements/quality.txt
     #   twine
-lazy-object-proxy==1.5.2
+lazy-object-proxy==1.6.0
     # via
     #   -r requirements/quality.txt
     #   astroid
@@ -156,7 +165,7 @@ pathspec==0.8.1
     # via
     #   -r requirements/quality.txt
     #   black
-pbr==5.5.1
+pbr==5.6.0
     # via
     #   -r requirements/quality.txt
     #   stevedore
@@ -164,7 +173,7 @@ pep517==0.10.0
     # via
     #   -r requirements/pip-tools.txt
     #   pip-tools
-pip-tools==6.0.1
+pip-tools==6.1.0
     # via -r requirements/pip-tools.txt
 pkginfo==1.7.0
     # via
@@ -177,7 +186,7 @@ pluggy==0.13.1
     #   diff-cover
     #   pytest
     #   tox
-polib==1.1.0
+polib==1.1.1
     # via edx-i18n-tools
 py==1.10.0
     # via
@@ -187,9 +196,9 @@ py==1.10.0
     #   tox
 pycodestyle==2.7.0
     # via -r requirements/quality.txt
-pydocstyle==5.1.1
+pydocstyle==6.0.0
     # via -r requirements/quality.txt
-pygments==2.8.1
+pygments==2.9.0
     # via
     #   -r requirements/quality.txt
     #   diff-cover
@@ -198,7 +207,7 @@ pylint-celery==0.3
     # via
     #   -r requirements/quality.txt
     #   edx-lint
-pylint-django==2.4.2
+pylint-django==2.4.4
     # via
     #   -r requirements/quality.txt
     #   edx-lint
@@ -207,7 +216,7 @@ pylint-plugin-utils==0.6
     #   -r requirements/quality.txt
     #   pylint-celery
     #   pylint-django
-pylint==2.7.2
+pylint==2.8.2
     # via
     #   -r requirements/quality.txt
     #   edx-lint
@@ -221,14 +230,14 @@ pyparsing==2.4.7
     #   packaging
 pytest-cov==2.11.1
     # via -r requirements/quality.txt
-pytest-django==4.1.0
+pytest-django==4.2.0
     # via -r requirements/quality.txt
-pytest==6.2.2
+pytest==6.2.4
     # via
     #   -r requirements/quality.txt
     #   pytest-cov
     #   pytest-django
-python-slugify==4.0.1
+python-slugify==5.0.0
     # via
     #   -r requirements/quality.txt
     #   code-annotations
@@ -245,7 +254,7 @@ readme-renderer==29.0
     # via
     #   -r requirements/quality.txt
     #   twine
-regex==2021.3.17
+regex==2021.4.4
     # via
     #   -r requirements/quality.txt
     #   black
@@ -307,26 +316,30 @@ tox==3.23.0
     #   -r requirements/ci.txt
     #   -r requirements/quality.txt
     #   tox-battery
-tqdm==4.59.0
+tqdm==4.60.0
     # via
     #   -r requirements/quality.txt
     #   twine
 twine==3.4.1
     # via -r requirements/quality.txt
-typed-ast==1.4.2
+typed-ast==1.4.3
     # via
     #   -r requirements/quality.txt
+    #   astroid
     #   black
-typing-extensions==3.7.4.3
+typing-extensions==3.10.0.0
     # via
+    #   -r requirements/ci.txt
+    #   -r requirements/pip-tools.txt
     #   -r requirements/quality.txt
     #   black
+    #   importlib-metadata
 urllib3==1.26.4
     # via
     #   -r requirements/ci.txt
     #   -r requirements/quality.txt
     #   requests
-virtualenv==20.4.3
+virtualenv==20.4.4
     # via
     #   -r requirements/ci.txt
     #   -r requirements/quality.txt
@@ -335,14 +348,19 @@ webencodings==0.5.1
     # via
     #   -r requirements/quality.txt
     #   bleach
+wheel==0.36.2
+    # via -r requirements/quality.txt
 wrapt==1.12.1
     # via
     #   -r requirements/quality.txt
     #   astroid
 zipp==3.4.1
     # via
+    #   -r requirements/ci.txt
+    #   -r requirements/pip-tools.txt
     #   -r requirements/quality.txt
     #   importlib-metadata
+    #   pep517
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
