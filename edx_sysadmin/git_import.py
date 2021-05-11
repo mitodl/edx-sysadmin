@@ -9,6 +9,7 @@ import os
 import re
 import subprocess
 
+from celery import shared_task
 from django.conf import settings
 from django.core import management
 from django.core.management.base import CommandError
@@ -221,7 +222,8 @@ def switch_branch(branch, rdir):
         raise GitImportErrorCannotBranch()
 
 
-def add_repo(repo, rdir_in, branch=None):
+@shared_task()
+def add_repo(repo, rdir_in=None, branch=None):
     """
     This will add a git repo into the mongo modulestore.
     If branch is left as None, it will fetch the most recent
