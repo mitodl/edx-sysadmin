@@ -1,4 +1,5 @@
 import json
+import logging
 
 from django.conf import settings
 from django.utils.decorators import method_decorator
@@ -14,6 +15,9 @@ from edx_sysadmin.utils.utils import (
 )
 
 from git import Repo, InvalidGitRepositoryError, NoSuchPathError
+
+
+logger = logging.getLogger(__name__)
 
 
 @method_decorator(authenticate_github_request(), name="post")
@@ -41,6 +45,7 @@ class GitReloadAPIView(APIView):
                         if repo_ssh_url:
                             add_repo.delay(repo_ssh_url)
                             message = f"Git reload feature has been triggered for repo: {repo_name} and branch: {active_branch}"
+                            logger.info(message)
                             return Response(
                                 {"message": message},
                                 status=status.HTTP_200_OK,
@@ -56,6 +61,7 @@ class GitReloadAPIView(APIView):
         except:
             message = "Request Payload is not appropriate"
 
+        logger.exception(message)
         return Response(
             {"message": message},
             status=status.HTTP_400_BAD_REQUEST,
