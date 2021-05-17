@@ -27,6 +27,12 @@ def authenticate_github_request():
         Validates Github request
         :returns boolean: True if HMAC matches else False
         """
+        if not hasattr(settings, "SYSADMIN_GITHUB_WEBHOOK_KEY"):
+            logger.exception(
+                "SYSADMIN_GITHUB_WEBHOOK_KEY is not configured in settings"
+            )
+            return False
+
         header_signature = request.headers.get("X-Hub-Signature-256")
         if header_signature is None:
             return False
