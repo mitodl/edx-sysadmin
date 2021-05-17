@@ -2,9 +2,10 @@
 Utility function defined here.
 """
 import json
-import requests
+import logging
 import urllib.parse
 import os
+import requests
 
 from django import forms
 from django.conf import settings
@@ -30,6 +31,7 @@ from edx_sysadmin.utils.markup import HTML, Text
 
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
 
 
 def get_course_by_id(course_key, depth=0):
@@ -449,7 +451,8 @@ def get_local_course_repo(repo_name):
         except (
             InvalidGitRepositoryError,
             NoSuchPathError,
-        ):
+        ) as e:
+            logger.exception(str(e))
             return None
 
 
@@ -463,5 +466,5 @@ def get_local_active_branch(repo):
         if repo:
             return repo.active_branch.path
     except TypeError:
-        message = "Unable to get current branch of checked out repo"
+        logger.exception("Unable to get current branch of checked out repo")
         return None

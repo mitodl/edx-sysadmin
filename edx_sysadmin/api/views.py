@@ -44,7 +44,10 @@ class GitReloadAPIView(APIView):
                         repo_ssh_url = payload["repository"]["ssh_url"]
                         if repo_ssh_url:
                             add_repo.delay(repo_ssh_url)
-                            message = f"Git reload feature has been triggered for repo: {repo_name} and branch: {active_branch}"
+                            message = (
+                                f"Git reload feature has been triggered for"
+                                f" repo: {repo_name} and branch: {active_branch}"
+                            )
                             logger.info(message)
                             return Response(
                                 {"message": message},
@@ -58,8 +61,9 @@ class GitReloadAPIView(APIView):
                     message = f"The course repo ({repo_name}) is not in use"
             else:
                 message = "The API works for 'Push' events only"
-        except:
-            message = "Request Payload is not appropriate"
+        except Exception as e:
+            logger.exception(str(e))
+            message = f"Request Payload is not appropriate"
 
         logger.exception(message)
         return Response(
