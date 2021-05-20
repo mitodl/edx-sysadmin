@@ -428,26 +428,15 @@ def remove_old_course_import_logs(course_id):
         return 0
 
 
-def get_git_course_repos_dir_path():
-    """
-    Get absolute path where course repos are cloned from git
-    :return str: absolute path of git course repos else None
-    """
-    if os.path.isdir(settings.GIT_REPO_DIR):
-        return settings.GIT_REPO_DIR
-
-
 def get_local_course_repo(repo_name):
     """
     Get local course repo
     :param repo_name: course repo name to be fetched from local repos directory
     :return git.Repo: git course repo object else None
     """
-    repos_path = get_git_course_repos_dir_path()
-    if repos_path and repo_name:
+    if os.path.isdir(settings.GIT_REPO_DIR) and repo_name:
         try:
-            repo = Repo(os.path.join(repos_path, repo_name))
-            return repo
+            return Repo(os.path.join(settings.GIT_REPO_DIR, repo_name))
         except (
             InvalidGitRepositoryError,
             NoSuchPathError,
