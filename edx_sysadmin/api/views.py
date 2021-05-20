@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from edx_sysadmin.api.decorators import authenticate_github_request
+from edx_sysadmin.api.permissions import GithubWebhookPermission
 from edx_sysadmin.git_import import add_repo
 from edx_sysadmin.utils.utils import (
     get_local_active_branch,
@@ -20,11 +20,12 @@ from git import Repo, InvalidGitRepositoryError, NoSuchPathError
 logger = logging.getLogger(__name__)
 
 
-@method_decorator(authenticate_github_request(), name="post")
 class GitReloadAPIView(APIView):
     """
     APIView to reload courses from github on triggering github webhook
     """
+
+    permission_classes = [GithubWebhookPermission]
 
     def post(self, request):
         """
