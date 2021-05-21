@@ -3,6 +3,7 @@ import logging
 
 from django.conf import settings
 from django.utils.decorators import method_decorator
+from django.utils.translation import ugettext as _
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -38,24 +39,28 @@ class GitReloadAPIView(APIView):
             pushed_branch = payload.get("ref", "")
 
             if not event == "push":
-                err_msg = "The API works for 'Push' events only"
+                err_msg = _("The API works for 'Push' events only")
             elif not repo_name:
-                err_msg = "Couldn't find Repo's name in the payload"
+                err_msg = _("Couldn't find Repo's name in the payload")
             elif not repo_ssh_url:
-                err_msg = "Couldn't find Repo's ssh_url in the payload"
+                err_msg = _("Couldn't find Repo's ssh_url in the payload")
             elif not pushed_branch:
-                err_msg = "Couldn't find Repo's pushed branch ref in the payload"
+                err_msg = _("Couldn't find Repo's pushed branch ref in the payload")
             else:
                 repo = get_local_course_repo(repo_name)
                 if not repo:
-                    err_msg = f"The course repo ({repo_name}) is not in use"
+                    err_msg = _("The course repo ({}) is not in use").format(repo_name)
                 else:
                     active_branch = get_local_active_branch(repo)
                     if not active_branch or not active_branch == pushed_branch:
-                        err_msg = f"The pushed branch ({pushed_branch}) is not currently in use"
+                        err_msg = _(
+                            "The pushed branch ({}) is not currently in use"
+                        ).format(pushed_branch)
                     else:
                         add_repo.delay(repo_ssh_url)
-                        msg = f"Triggered reloading branch: {active_branch} of repo: {repo_name}"
+                        msg = _("Triggered reloading branch: {} of repo: {}").format(
+                            active_branch, repo_name
+                        )
                         logger.info(f"{self.__class__.__name__}:: {msg}")
                         return Response(
                             {"message": msg},

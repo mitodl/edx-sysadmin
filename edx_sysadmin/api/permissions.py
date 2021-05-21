@@ -8,6 +8,7 @@ import logging
 
 from django.conf import settings
 from django.utils.encoding import force_bytes
+from django.utils.translation import ugettext as _
 from rest_framework import permissions, status
 from rest_framework.exceptions import APIException
 from rest_framework.response import Response
@@ -22,7 +23,7 @@ class GithubWebhookPermissionException(APIException):
     """
 
     status_code = status.HTTP_403_FORBIDDEN
-    default_code = "not_authenticated"
+    default_code = _("not_authenticated")
 
 
 class GithubWebhookPermission(permissions.BasePermission):
@@ -41,16 +42,16 @@ class GithubWebhookPermission(permissions.BasePermission):
             if not hasattr(settings, "SYSADMIN_GITHUB_WEBHOOK_KEY"):
                 return (
                     False,
-                    "SYSADMIN_GITHUB_WEBHOOK_KEY is not configured in settings",
+                    _("SYSADMIN_GITHUB_WEBHOOK_KEY is not configured in settings"),
                 )
 
             header_signature = request.headers.get("X-Hub-Signature-256")
             if header_signature is None:
-                return False, "X-Hub-Signature-256 not found in request headers"
+                return False, _("X-Hub-Signature-256 not found in request headers")
 
             sha_name, signature = header_signature.split("=")
             if sha_name != "sha256":
-                return False, "Signature is not using sha256"
+                return False, _("Signature is not using sha256")
 
             mac = hmac.new(
                 force_bytes(settings.SYSADMIN_GITHUB_WEBHOOK_KEY),
@@ -60,7 +61,7 @@ class GithubWebhookPermission(permissions.BasePermission):
             if not hmac.compare_digest(
                 force_bytes(mac.hexdigest()), force_bytes(signature)
             ):
-                return False, "Signatures didn't match"
+                return False, _("Signatures didn't match")
 
             return True, ""
 
