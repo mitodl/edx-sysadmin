@@ -63,8 +63,7 @@ class GitReloadAPIView(APIView):
                         )
 
         except Exception as e:
-            logger.exception(str(e))
-            message = f"Request Payload is not appropriate"
+            err_msg = str(e)
 
         logger.exception(f"{self.__class__.__name__}:: {err_msg}")
         return Response(
