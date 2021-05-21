@@ -2,7 +2,6 @@
 Tests for Permissions
 """
 import ddt
-from unittest.mock import patch
 
 from django.conf import settings
 from django.test import TestCase, override_settings
@@ -34,18 +33,12 @@ class GithubWebhookPermissionTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     @override_settings(SYSADMIN_GITHUB_WEBHOOK_KEY=SYSADMIN_GITHUB_WEBHOOK_KEY)
-    @patch(
-        "edx_sysadmin.api.views.GitReloadAPIView.post",
-        return_value=Response({}, status=status.HTTP_200_OK),
-    )
     @ddt.data(
-        (VALID_SIGNATURE, status.HTTP_200_OK),
+        (VALID_SIGNATURE, status.HTTP_400_BAD_REQUEST),
         (INVALID_SIGNATURE, status.HTTP_403_FORBIDDEN),
     )
     @ddt.unpack
-    def test_GithubWebhookPermission_with_keys(
-        self, signature, code, mocked_post_method
-    ):
+    def test_GithubWebhookPermission_with_keys(self, signature, code):
         """Test GithubWebhookPermission with signature keys"""
 
         response = self.client.post(
@@ -54,10 +47,5 @@ class GithubWebhookPermissionTestCase(TestCase):
             format="json",
             **{"HTTP_X_Hub_Signature_256": f"sha256={signature}"},
         )
-
-        if code != status.HTTP_200_OK:
-            mocked_post_method.assert_not_called()
-        else:
-            mocked_post_method.assert_called()
 
         self.assertEqual(response.status_code, code)
