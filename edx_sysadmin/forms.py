@@ -12,7 +12,9 @@ class UserRegistrationForm(forms.Form):
 
     name = forms.CharField(label="Full Name", max_length=100)
     username = forms.CharField(label="Username", max_length=100)
-    password = forms.CharField(label="Password", max_length=100)
+    password = forms.CharField(
+        label="Password", widget=forms.PasswordInput, max_length=100
+    )
     email = forms.EmailField(label="Email Address")
 
     def __init__(self, *args, **kwargs):
