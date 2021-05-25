@@ -214,6 +214,10 @@ class UsersPanel(SysadminDashboardBaseView):
             context.update(
                 create_user_account(form.cleaned_data, request.build_absolute_uri)
             )
+            if context.get("success_message"):
+                success_message = context.get("success_message")
+                context = self.get_context_data()
+                context["success_message"] = success_message
         else:
             context["error_message"] = _(
                 "Unable to create new account due to invalid data"
