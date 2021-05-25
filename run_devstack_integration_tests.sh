@@ -20,9 +20,6 @@ cp -r test_root/ /edx-sysadmin/test_root
 cd /edx-sysadmin
 pip install -e .
 
-# Install codecov so we can upload code coverage results
-pip install codecov
-
 # output the packages which are installed for logging
 pip freeze
 
@@ -57,3 +54,7 @@ then
     echo "pylint exited with a non-zero status"
     exit $PYLINT_SUCCESS
 fi
+
+set -e
+coverage xml
+
