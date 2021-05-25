@@ -8,4 +8,7 @@ coverage:
       default:
         enabled: no
 
-comment: false
+comment:
+  layout: "reach, diff, flags, files"
+  behavior: default
+  require_changes: false
