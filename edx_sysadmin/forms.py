@@ -42,6 +42,9 @@ class UserRegistrationForm(forms.Form):
                 self.fields[field] = value["field_type"](initial=value["default_value"])
 
     def clean_confirm_password(self):
+        """
+        Validates if confirm_password matches password or not
+        """
         password = self.cleaned_data.get("password")
         confirm_password = self.cleaned_data.get("confirm_password")
         if password and confirm_password and password != confirm_password:
