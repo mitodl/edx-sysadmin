@@ -209,7 +209,6 @@ class UsersPanel(SysadminDashboardBaseView):
         extra_fields = get_registration_required_extra_fields_with_values()
         form = UserRegistrationForm(request.POST, extra_fields=extra_fields)
         context = self.get_context_data(initial_data=request.POST, **kwargs)
-
         if form.is_valid():
             context.update(
                 create_user_account(form.cleaned_data, request.build_absolute_uri)
