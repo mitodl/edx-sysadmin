@@ -1,7 +1,7 @@
 """
 URLs for edx_sysadmin.
 """
-from django.conf.urls import url
+from django.conf.urls import url, include
 
 from edx_sysadmin.views import (
     SysadminDashboardRedirectionView,
@@ -21,4 +21,5 @@ urlpatterns = [
     url(r"^gitlogs/?$", GitLogs.as_view(), name="gitlogs"),
     url(r"^gitlogs/(?P<course_id>.+)$", GitLogs.as_view(), name="gitlogs_detail"),
     url(r"^users/$", UsersPanel.as_view(), name="users"),
+    url(r"^api/", include("edx_sysadmin.api.urls", namespace="api")),
 ]

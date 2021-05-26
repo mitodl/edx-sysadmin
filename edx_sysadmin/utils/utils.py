@@ -2,10 +2,10 @@
 Utility function defined here.
 """
 import json
+import logging
 import urllib.parse
+import os
 import requests
-
-from django_countries import countries
 
 from django import forms
 from django.conf import settings
@@ -13,6 +13,8 @@ from django.contrib.auth import get_user_model
 from django.http import Http404
 from django.urls import reverse
 from django.utils.translation import ugettext as _
+from django_countries import countries
+from git import Repo, InvalidGitRepositoryError, NoSuchPathError
 
 from common.djangoapps.student.models import UserProfile
 from common.djangoapps.student.roles import (
@@ -29,6 +31,7 @@ from edx_sysadmin.utils.markup import HTML, Text
 
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
 
 
 def get_course_by_id(course_key, depth=0):
@@ -423,3 +426,34 @@ def remove_old_course_import_logs(course_id):
         return deletion_count
     else:
         return 0
+
+
+def get_local_course_repo(repo_name):
+    """
+    Get local course repo
+    :param repo_name: course repo name to be fetched from local repos directory
+    :return git.Repo: git course repo object else None
+    """
+    if os.path.isdir(settings.GIT_REPO_DIR) and repo_name:
+        try:
+            return Repo(os.path.join(settings.GIT_REPO_DIR, repo_name))
+        except (
+            InvalidGitRepositoryError,
+            NoSuchPathError,
+        ) as e:
+            logger.exception(str(e))
+            return None
+
+
+def get_local_active_branch(repo):
+    """
+    Get active branch of a git repo
+    :param repo (git.Repo object): course repo
+    :return str: active branch name of repo else None
+    """
+    try:
+        if repo:
+            return repo.active_branch.path
+    except TypeError:
+        logger.exception("Unable to get current branch of checked out repo")
+        return None
