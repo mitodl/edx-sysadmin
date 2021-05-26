@@ -28,8 +28,8 @@
         <h2>{{datatable.title}}</h2>
         <table class="stat_table">
             <tr>
-                {% for header in datatable.header %}
-                    <th>{{header}}</th>
+                {% for column in datatable.header %}
+                    <th>{{column}}</th>
                 {% endfor %}
             </tr>
             {% for row in datatable.data %}
