@@ -168,7 +168,6 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         course = def_ms.get_course(CourseLocator("MITx", "edx4edx", "edx4edx"))
         assert course is None
 
-    @pytest.mark.skip(reason="FIXME: Refactor needed for the test")
     def test_course_info(self):
         """
         Check to make sure we are getting git info for courses
@@ -189,11 +188,12 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         self._mkdir(settings.GIT_REPO_DIR)
 
         # Make sure we don't have any git hashes on the page
-        response = self.client.get(reverse("sysadmin_courses"))
+        response = self.client.get(reverse("sysadmin:courses"))
         self.assertNotRegex(response.content.decode("utf-8"), table_re)
 
         # Now add the course and make sure it does match
-        response = self._add_edx4edx()
+        self._add_edx4edx()
+        response = self.client.get(reverse("sysadmin:courses"))
         self.assertRegex(response.content.decode("utf-8"), table_re)
 
     def test_gitlogs(self):

@@ -19,6 +19,29 @@
         </div>
     </form>
     <hr style="width:100%" />
+
+    {% if datatable %}
+        <br/>
+        <br/>
+        <p>
+        <hr width="100%">
+        <h2>{{datatable.title}}</h2>
+        <table class="stat_table">
+            <tr>
+                {% for column in datatable.header %}
+                    <th>{{column}}</th>
+                {% endfor %}
+            </tr>
+            {% for row in datatable.data %}
+            <tr>
+                {% for value in row %}
+                <td>{{value}}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+        </p>
+    {% endif %}
 {% endblock panel %}
 {% block msg %}
 	{% if msg %}
