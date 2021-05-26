@@ -12,7 +12,12 @@ class UserRegistrationForm(forms.Form):
 
     name = forms.CharField(label="Full Name", max_length=100)
     username = forms.CharField(label="Username", max_length=100)
-    password = forms.CharField(label="Password", max_length=100)
+    password = forms.CharField(
+        label="Password", widget=forms.PasswordInput, max_length=100
+    )
+    confirm_password = forms.CharField(
+        label="Confirm Password", widget=forms.PasswordInput, max_length=100
+    )
     email = forms.EmailField(label="Email Address")
 
     def __init__(self, *args, **kwargs):
@@ -35,6 +40,16 @@ class UserRegistrationForm(forms.Form):
                 self.initial[field] = value["choices"][0]
             else:
                 self.fields[field] = value["field_type"](initial=value["default_value"])
+
+    def clean_confirm_password(self):
+        """
+        Validates if confirm_password matches password or not
+        """
+        password = self.cleaned_data.get("password")
+        confirm_password = self.cleaned_data.get("confirm_password")
+        if password and confirm_password and password != confirm_password:
+            raise forms.ValidationError("Passwords do not match")
+        return confirm_password
 
     def clean(self):
         """

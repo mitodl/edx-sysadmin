@@ -78,6 +78,10 @@ textarea {
 	padding: 20px;
 }
 
+.errorlist {
+    color: red;
+}
+
 .success_message {
 	background-color: #DFF2BF;
 	border-radius: 10px;
