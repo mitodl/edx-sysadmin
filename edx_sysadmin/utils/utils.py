@@ -318,15 +318,15 @@ def get_fields_and_default_values_map():
         },
         "mailing_address": {
             "field_type": forms.CharField,
-            "default_value": "This is the default Mailing Address",
+            "default_value": "",
         },
         "goals": {
             "field_type": forms.CharField,
-            "default_value": "This is the default Goal",
+            "default_value": "",
         },
-        "honor_code": {"field_type": forms.BooleanField, "default_value": True},
-        "terms_of_service": {"field_type": forms.BooleanField, "default_value": True},
-        "city": {"field_type": forms.CharField, "default_value": "Kabul"},
+        "honor_code": {"field_type": forms.BooleanField, "default_value": False},
+        "terms_of_service": {"field_type": forms.BooleanField, "default_value": False},
+        "city": {"field_type": forms.CharField, "default_value": ""},
         "country": {
             "field_type": forms.TypedChoiceField,
             "choices": get_country_choices(),
