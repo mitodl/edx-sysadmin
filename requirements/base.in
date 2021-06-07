@@ -3,3 +3,4 @@
 
 Django>=2.2              # Web application framework
 wheel
+GitPython
