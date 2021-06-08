@@ -233,7 +233,7 @@ class CoursesPanel(SysadminDashboardBaseView):
                 # don't delete user permission groups, though
                 message += Text(
                     _(
-                        "{font_start} Deleted {location} = {course_id} {course_name} {font_end}"
+                        "{font_start} Deleted {course_name} = {course_id} {location} {font_end}"
                     )
                 ).format(
                     font_start=HTML("<font class='success'>"),

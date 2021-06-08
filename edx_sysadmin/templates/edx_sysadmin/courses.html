@@ -20,6 +20,11 @@
     </form>
     <hr style="width:100%" />
 
+    {% block msg %}
+        {% if msg %}
+            <p>{{msg}}</p>
+        {% endif %}
+    {% endblock msg %}
     {% if datatable %}
         <br/>
         <br/>
@@ -43,8 +48,3 @@
         </p>
     {% endif %}
 {% endblock panel %}
-{% block msg %}
-	{% if msg %}
-		<p>{{msg}}</p>
-    {% endif %}
-{% endblock msg %}
