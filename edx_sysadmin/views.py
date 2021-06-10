@@ -118,13 +118,12 @@ class CoursesPanel(SysadminDashboardBaseView):
     """
 
     template_name = "edx_sysadmin/courses.html"
-    def_ms = modulestore()
     datatable = []
 
     def get_courses(self):
         """Get an iterable list of courses."""
 
-        return self.def_ms.get_courses()
+        return modulestore().get_courses()
 
     def git_info_for_course(self, cdir):
         """This pulls out some git info like the last commit"""
