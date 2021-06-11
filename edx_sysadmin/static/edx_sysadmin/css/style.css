@@ -1,13 +1,16 @@
 /*
 Sysadmin Stylesheet
 */
-
+:root{
+    --brand-red: #cb0712;
+    --brand-green: #008000;
+}
 .main-heading {
     font-size: 30px;
 }
 
 .warning-alert h5 {
-    color: red;
+    color: var(--brand-red);
     text-align: left;
     text-decoration: underline;
     margin-bottom: 10px;
@@ -62,30 +65,28 @@ textarea {
 }
 
 .error {
-    color: red;
+    color: var(--brand-red);
 }
 
 .success {
-    color: green;
+    color: var(--brand-green);
 }
 
 .error_message {
-	background-color: #FFBABA;
+    color: var(--brand-red);
 	border-radius: 10px;
-	color: black;
 	margin-bottom: 20px;
 	margin-top: 10px;
 	padding: 20px;
 }
 
 .errorlist {
-    color: red;
+    color: var(--brand-red);
 }
 
 .success_message {
-	background-color: #DFF2BF;
 	border-radius: 10px;
-	color: black;
+	color: var(--brand-green);
 	margin-bottom: 20px;
 	margin-top: 10px;
 	padding: 20px;

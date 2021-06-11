@@ -105,7 +105,7 @@ def get_registration_required_extra_fields_with_values():
 def is_registration_api_functional():
     """
     Checks if User Registration API "/user_api/v1/account/registration/" is functional or not
-    depending upon two environemnt variables "settings.FEATURES['ALLOW_PUBLIC_ACCOUNT_CREATION']"
+    depending upon two environment variables "settings.FEATURES['ALLOW_PUBLIC_ACCOUNT_CREATION']"
     and "settings.ENABLE_REQUIRE_THIRD_PARTY_AUTH"
 
     Arguments:

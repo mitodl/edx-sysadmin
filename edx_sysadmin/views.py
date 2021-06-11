@@ -332,9 +332,10 @@ class GitImport(SysadminDashboardBaseView):
             or gitloc.startswith("https:")
             or gitloc.startswith("git:")
         ):
-            return _(
+            message = HTML("<p style='color:#cb0712'>{0}</p>").format(
                 "The git repo location should end with '.git', " "and be a valid url"
             )
+            return message
 
         return self.import_mongo_course(gitloc, branch)
 
@@ -381,10 +382,10 @@ class GitImport(SysadminDashboardBaseView):
 
         if error_msg:
             msg_header = error_msg
-            color = "red"
+            color = "#cb0712"
         else:
             msg_header = _("Added Course")
-            color = "blue"
+            color = "#008000"
 
         message = HTML("<h4 style='color:{0}'>{1}</h4>").format(color, msg_header)
         message += HTML("<pre>{0}</pre>").format(escape(ret))
