@@ -2,6 +2,11 @@
 
 {% load i18n static %}
 
+{% block headextra %}
+{{ block.super }}
+    <script type="text/javascript" src="{% static 'edx_sysadmin/js/course.js' %}"></script>
+{% endblock %}
+
 {% block panel %}
     <h3>{% trans "Administer Courses" %}</h3><br/>
     <form name="action" method="POST">
@@ -31,17 +36,22 @@
         <p>
         <hr width="100%">
         <h2>{{datatable.title}}</h2>
-        <table class="stat_table">
+        <table class="stat_table courses_table">
             <tr>
                 {% for column in datatable.header %}
                     <th>{{column}}</th>
                 {% endfor %}
             </tr>
-            {% for row in datatable.data %}
-            <tr>
-                {% for value in row %}
-                <td>{{value}}</td>
-                {% endfor %}
+            {% for key, value in datatable.data.items %}
+            <tr id="{{value.gdir}}">
+                <td>{{value.display_name}}</td>
+                <td>{{value.course_id}}</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>
+                    <button onClick="getCourseGitDetails(this, '{{datatable.api_url}}', '{{value.gdir}}')">Load Details</button>
+                </td>
             </tr>
             {% endfor %}
         </table>
