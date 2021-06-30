@@ -10,8 +10,8 @@ function getCourseGitDetails(button, apiUrl, gdir) {
             },
             success: function(result){
                 tds[2].innerHTML = result.commit ? result.commit : "Not Found";
-                tds[3].innerHTML = result.author ? result.author : "Not Found";
-                tds[4].innerHTML = result.date ? result.date : "Not Found";
+                tds[3].innerHTML = result.date ? result.date : "Not Found";
+                tds[4].innerHTML = result.author ? result.author : "Not Found";
                 button.textContent = "Update Details"
                 button.disabled = false;
             },

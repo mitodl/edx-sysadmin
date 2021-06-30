@@ -3,11 +3,7 @@ Views for the Open edX SysAdmin Plugin
 """
 import logging
 from io import StringIO
-import json
-import subprocess
-from path import Path as path
 
-from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import Http404
