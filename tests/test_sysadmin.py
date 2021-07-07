@@ -168,34 +168,6 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         course = def_ms.get_course(CourseLocator("MITx", "edx4edx", "edx4edx"))
         assert course is None
 
-    def test_course_info(self):
-        """
-        Check to make sure we are getting git info for courses
-        """
-        # Regex of first 3 columns of course information table row for
-        # test course loaded from git. Would not have sha1 if
-        # git_info_for_course failed.
-        table_re = re.compile(
-            """
-            <tr>\\s+
-            <td>edX\\sAuthor\\sCourse</td>\\s+  # expected test git course name
-            <td>course-v1:MITx\\+edx4edx\\+edx4edx</td>\\s+  # expected test git course_id
-            <td>[a-fA-F\\d]{40}</td>  # git sha1 hash
-        """,
-            re.VERBOSE,
-        )
-        self._setstaff_login()
-        self._mkdir(settings.GIT_REPO_DIR)
-
-        # Make sure we don't have any git hashes on the page
-        response = self.client.get(reverse("sysadmin:courses"))
-        self.assertNotRegex(response.content.decode("utf-8"), table_re)
-
-        # Now add the course and make sure it does match
-        self._add_edx4edx()
-        response = self.client.get(reverse("sysadmin:courses"))
-        self.assertRegex(response.content.decode("utf-8"), table_re)
-
     def test_gitlogs(self):
         """
         Create a log entry and make sure it exists

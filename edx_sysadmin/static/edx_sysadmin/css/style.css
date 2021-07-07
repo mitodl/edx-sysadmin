@@ -56,6 +56,17 @@ table.stat_table td {
     background-color: #ffffff;
 }
 
+table.stat_table.courses_table {
+    width: 100%;
+}
+
+table.stat_table.courses_table td button {
+    display: block;
+    margin: auto;
+    width: 170px;
+    height: 60px;
+}
+
 a.selectedmode {
     background-color: yellow;
 }

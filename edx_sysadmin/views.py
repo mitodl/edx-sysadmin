@@ -3,11 +3,7 @@ Views for the Open edX SysAdmin Plugin
 """
 import logging
 from io import StringIO
-import json
-import subprocess
-from path import Path as path
 
-from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import Http404
@@ -125,54 +121,16 @@ class CoursesPanel(SysadminDashboardBaseView):
 
         return modulestore().get_courses()
 
-    def git_info_for_course(self, cdir):
-        """This pulls out some git info like the last commit"""
-
-        cmd = ""
-        gdir = settings.DATA_DIR / cdir
-        info = ["", "", ""]
-
-        # Try the data dir, then try to find it in the git import dir
-        if not gdir.exists():
-            git_repo_dir = getattr(
-                settings, "GIT_REPO_DIR", git_import.DEFAULT_GIT_REPO_DIR
-            )
-            gdir = path(git_repo_dir) / cdir
-            if not gdir.exists():
-                return info
-
-        cmd = [
-            "git",
-            "log",
-            "-1",
-            u'--format=format:{ "commit": "%H", "author": "%an %ae", "date": "%ad"}',
-        ]
-        try:
-            output_json = json.loads(
-                subprocess.check_output(cmd, cwd=gdir).decode("utf-8")
-            )
-            info = [
-                output_json["commit"],
-                output_json["date"],
-                output_json["author"],
-            ]
-        except OSError as error:
-            log.warning(("Error fetching git data: %s - %s"), cdir, error)
-        except (ValueError, subprocess.CalledProcessError):
-            pass
-
-        return info
-
     def make_datatable(self, courses=None):
         """Creates course information datatable"""
 
-        data = []
-        courses = courses or self.get_courses()
-        for course in courses:
-            gdir = course.id.course
-            data.append(
-                [course.display_name, course.id] + self.git_info_for_course(gdir)
-            )
+        data = {}
+        for course in courses or self.get_courses():
+            data[course.id] = {
+                "display_name": course.display_name,
+                "course_id": course.id,
+                "git_directory": course.id.course,
+            }
 
         return dict(
             header=[
@@ -182,9 +140,11 @@ class CoursesPanel(SysadminDashboardBaseView):
                 _("Git Commit"),
                 _("Last Change"),
                 _("Last Editor"),
+                _("Action"),
             ],
             title=_("Information about all courses"),
             data=data,
+            api_url=reverse("sysadmin:api:git-course-details"),
         )
 
     def get_context_data(self, **kwargs):
