@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.1.2
+Version 0.1.2 (Released July 07, 2021)
 -------------
 
 - Redesign courses git info table (#51)
