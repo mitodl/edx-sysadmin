@@ -129,7 +129,7 @@ class CoursesPanel(SysadminDashboardBaseView):
             data[course.id] = {
                 "display_name": course.display_name,
                 "course_id": course.id,
-                "gdir": course.id.course,
+                "git_directory": course.id.course,
             }
 
         return dict(

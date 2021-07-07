@@ -92,7 +92,6 @@ class GitCourseDetailsAPIView(APIView):
         """
         Get git related details of list of courses
         """
-        err_msg = ""
         try:
             course_dir = request.GET.get("courseDir")
             if course_dir:
@@ -112,17 +111,16 @@ class GitCourseDetailsAPIView(APIView):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    def git_info_for_course(self, cdir):
+    def git_info_for_course(self, course_dir):
         """This pulls out some git info like the last commit"""
 
-        cmd = ""
-        gdir = settings.DATA_DIR / cdir
+        git_dir = settings.DATA_DIR / course_dir
 
         # Try the data dir, then try to find it in the git import dir
-        if not gdir.exists():
+        if not git_dir.exists():
             git_repo_dir = getattr(settings, "GIT_REPO_DIR", DEFAULT_GIT_REPO_DIR)
-            gdir = path(git_repo_dir) / cdir
-            if not gdir.exists():
+            git_dir = path(git_repo_dir) / course_dir
+            if not git_dir.exists():
                 return ["", "", ""]
 
         cmd = [
@@ -133,11 +131,12 @@ class GitCourseDetailsAPIView(APIView):
         ]
         try:
             output_json = json.loads(
-                subprocess.check_output(cmd, cwd=gdir).decode("utf-8")
+                subprocess.check_output(cmd, cwd=git_dir).decode("utf-8")
             )
         except OSError as error:
-            logger.warning(("Error fetching git data: %s - %s"), cdir, error)
+            logger.warning("Error fetching git data: %s - %s", course_dir, error)
+            raise
         except (ValueError, subprocess.CalledProcessError):
-            pass
+            raise
 
         return output_json

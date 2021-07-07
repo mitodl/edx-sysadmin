@@ -1,4 +1,4 @@
-function getCourseGitDetails(button, apiUrl, gdir) {
+function getCourseGitDetails(button, apiUrl, gitDirectory) {
     let tds = button.parentElement.parentElement.children;
     button.disabled = true;
     $.ajax(
@@ -6,7 +6,7 @@ function getCourseGitDetails(button, apiUrl, gdir) {
             url: apiUrl,
             type: "GET",
             data: {
-                "courseDir": gdir,
+                "courseDir": gitDirectory,
             },
             success: function(result){
                 tds[2].innerHTML = result.commit ? result.commit : "Not Found";

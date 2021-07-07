@@ -43,14 +43,14 @@
                 {% endfor %}
             </tr>
             {% for key, value in datatable.data.items %}
-            <tr id="{{value.gdir}}">
+            <tr id="{{value.git_directory}}">
                 <td>{{value.display_name}}</td>
                 <td>{{value.course_id}}</td>
                 <td></td>
                 <td></td>
                 <td></td>
                 <td>
-                    <button onClick="getCourseGitDetails(this, '{{datatable.api_url}}', '{{value.gdir}}')">Load Details</button>
+                    <button onClick="getCourseGitDetails(this, '{{datatable.api_url}}', '{{value.git_directory}}')">Load Details</button>
                 </td>
             </tr>
             {% endfor %}
