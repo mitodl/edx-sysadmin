@@ -116,16 +116,16 @@ class CoursesPanel(SysadminDashboardBaseView):
     template_name = "edx_sysadmin/courses.html"
     datatable = []
 
-    def get_courses(self):
-        """Get an iterable list of courses."""
+    def get_course_summaries(self):
+        """Get an iterable list of course summaries."""
 
-        return modulestore().get_courses()
+        return modulestore().get_course_summaries()
 
     def make_datatable(self, courses=None):
         """Creates course information datatable"""
 
         data = {}
-        for course in courses or self.get_courses():
+        for course in courses or self.get_course_summaries():
             data[course.id] = {
                 "display_name": course.display_name,
                 "course_id": course.id,
