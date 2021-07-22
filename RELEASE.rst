@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.1.3
+Version 0.1.3 (Released July 22, 2021)
 -------------
 
 - use modulestore's get_course_summaries for optimization (#54)
