@@ -14,7 +14,7 @@ from django.conf import settings
 from django.core import management
 from django.core.management.base import CommandError
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from opaque_keys.edx.locator import CourseLocator
 from six import StringIO
 

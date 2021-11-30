@@ -4,80 +4,88 @@
 #
 #    make upgrade
 #
-appdirs==1.4.4
-    # via virtualenv
-attrs==20.3.0
+asgiref==3.4.1
+    # via
+    #   -r requirements/base.txt
+    #   django
+attrs==21.2.0
     # via pytest
-click==7.1.2
+backports.entry-points-selectable==1.1.1
+    # via virtualenv
+click==8.0.3
     # via code-annotations
-code-annotations==1.1.1
+code-annotations==1.2.0
     # via -r requirements/test.in
-coverage==5.5
+coverage[toml]==6.1.2
     # via pytest-cov
-distlib==0.3.1
+distlib==0.3.3
     # via virtualenv
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -r requirements/base.txt
-    #   code-annotations
-filelock==3.0.12
+filelock==3.4.0
     # via
     #   tox
     #   virtualenv
-importlib-metadata==4.0.1
+gitdb==4.0.9
     # via
-    #   pluggy
-    #   pytest
-    #   stevedore
-    #   tox
-    #   virtualenv
+    #   -r requirements/base.txt
+    #   gitpython
+gitpython==3.1.24
+    # via -r requirements/base.txt
 iniconfig==1.1.1
     # via pytest
-jinja2==2.11.3
+jinja2==3.0.3
     # via code-annotations
-markupsafe==1.1.1
+markupsafe==2.0.1
     # via jinja2
-packaging==20.9
+packaging==21.3
     # via
     #   pytest
     #   tox
-pbr==5.6.0
+pbr==5.8.0
     # via stevedore
-pluggy==0.13.1
+platformdirs==2.4.0
+    # via virtualenv
+pluggy==1.0.0
     # via
     #   pytest
     #   tox
-py==1.10.0
+py==1.11.0
     # via
     #   pytest
     #   tox
-pyparsing==2.4.7
+pyparsing==3.0.6
     # via packaging
-pytest-cov==2.11.1
+pytest-cov==3.0.0
     # via -r requirements/test.in
-pytest-django==4.2.0
+pytest-django==4.4.0
     # via -r requirements/test.in
-pytest==6.2.4
+pytest==6.2.5
     # via
     #   pytest-cov
     #   pytest-django
-python-slugify==5.0.0
+python-slugify==5.0.2
     # via code-annotations
-pytz==2021.1
+pytz==2021.3
     # via
     #   -r requirements/base.txt
     #   django
-pyyaml==5.4.1
+pyyaml==6.0
     # via code-annotations
-six==1.15.0
+six==1.16.0
     # via
     #   tox
     #   virtualenv
-sqlparse==0.4.1
+smmap==5.0.0
+    # via
+    #   -r requirements/base.txt
+    #   gitdb
+sqlparse==0.4.2
     # via
     #   -r requirements/base.txt
     #   django
-stevedore==3.3.0
+stevedore==3.5.0
     # via code-annotations
 text-unidecode==1.3
     # via python-slugify
@@ -85,13 +93,15 @@ toml==0.10.2
     # via
     #   pytest
     #   tox
-tox==3.23.0
+tomli==1.2.2
+    # via coverage
+tox==3.24.4
     # via -r requirements/test.in
-typing-extensions==3.10.0.0
-    # via importlib-metadata
-virtualenv==20.4.4
+typing-extensions==4.0.0
+    # via
+    #   -r requirements/base.txt
+    #   gitpython
+virtualenv==20.10.0
     # via tox
-wheel==0.36.2
+wheel==0.37.0
     # via -r requirements/base.txt
-zipp==3.4.1
-    # via importlib-metadata
