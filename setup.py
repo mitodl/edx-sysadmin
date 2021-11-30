@@ -93,3 +93,4 @@ setup(
         "cms.djangoapp": [],
     },
 )
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"

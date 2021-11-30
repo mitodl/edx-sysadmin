@@ -77,7 +77,7 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
         )
         # Not a valid path.
         self.assertCommandFailureRegexp(
-            u"Path {0} doesn't exist, please create it,".format(self.git_repo_dir),
+            "Path {0} doesn't exist, please create it,".format(self.git_repo_dir),
             "blah",
         )
         # Test successful import from command

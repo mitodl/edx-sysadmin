@@ -28,7 +28,7 @@ jobs:
           cd ../edx-platform
           git remote add mitodl https://github.com/mitodl/edx-platform.git
           git fetch mitodl
-          git checkout mitodl/mitx/lilac
+          git checkout mitodl/mitx/maple
 
       - name: Run tests
         run: |
