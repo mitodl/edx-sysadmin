@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.1.4
+Version 0.1.4 (Released December 02, 2021)
 -------------
 
 - build: Upgrade Django to 3.2 (#57)
