@@ -45,9 +45,13 @@ class GithubWebhookPermission(permissions.BasePermission):
                     _("SYSADMIN_GITHUB_WEBHOOK_KEY is not configured in settings"),
                 )
 
-            header_signature = request.headers.get("X-Hub-Signature-256") or request.headers.get("X-Hub-Signature")
+            header_signature = request.headers.get(
+                "X-Hub-Signature-256"
+            ) or request.headers.get("X-Hub-Signature")
             if header_signature is None:
-                return False, _("X-Hub-Signature-256 or sha1 not found in request headers")
+                return False, _(
+                    "X-Hub-Signature-256 or sha1 not found in request headers"
+                )
 
             sha_name, signature = header_signature.split("=")
             if sha_name not in ["sha256", "sha1"]:
