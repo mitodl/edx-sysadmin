@@ -2,7 +2,7 @@
 Custom Permissions for edx-sysadmin API Views
 """
 
-from hashlib import sha256
+from hashlib import sha256, sha1
 import hmac
 import logging
 
@@ -45,18 +45,18 @@ class GithubWebhookPermission(permissions.BasePermission):
                     _("SYSADMIN_GITHUB_WEBHOOK_KEY is not configured in settings"),
                 )
 
-            header_signature = request.headers.get("X-Hub-Signature-256")
+            header_signature = request.headers.get("X-Hub-Signature-256") or request.headers.get("X-Hub-Signature")
             if header_signature is None:
-                return False, _("X-Hub-Signature-256 not found in request headers")
+                return False, _("X-Hub-Signature-256 or sha1 not found in request headers")
 
             sha_name, signature = header_signature.split("=")
-            if sha_name != "sha256":
-                return False, _("Signature is not using sha256")
+            if sha_name not in ["sha256", "sha1"]:
+                return False, _("Signature is not using sha256 or sha1")
 
             mac = hmac.new(
                 force_bytes(settings.SYSADMIN_GITHUB_WEBHOOK_KEY),
                 msg=force_bytes(request.body),
-                digestmod=sha256,
+                digestmod=sha256 if sha_name == "sha256" else sha1,
             )
             if not hmac.compare_digest(
                 force_bytes(mac.hexdigest()), force_bytes(signature)
