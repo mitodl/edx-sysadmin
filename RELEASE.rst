@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.1.5
+Version 0.1.5 (Released December 17, 2021)
 -------------
 
 - Add fallback for sha1 (#60)
