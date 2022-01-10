@@ -27,6 +27,7 @@ from edx_sysadmin.utils.utils import remove_old_course_import_logs
 log = logging.getLogger(__name__)
 
 DEFAULT_GIT_REPO_DIR = "/edx/var/app/edxapp/git_course_repos"
+DEFAULT_GIT_REPO_PREFIX = "refs/heads/"
 
 
 # pylint: disable=raise-missing-from
@@ -165,7 +166,7 @@ def switch_branch(branch, rdir):
         "ls-remote",
         "origin",
         "-h",
-        "refs/heads/{0}".format(branch),
+        f"{DEFAULT_GIT_REPO_PREFIX}{branch}",
     ]
     try:
         output = cmd_log(cmd, rdir)
@@ -303,7 +304,7 @@ def add_repo(repo, rdir_in=None, branch=None):
     try:
         branch = cmd_log(cmd, cwd=rdirp)
     except subprocess.CalledProcessError as ex:
-        # I can't discover a way to excercise this, but git is complex
+        # I can't discover a way to exercise this, but git is complex
         # so still logging and raising here in case.
         log.exception("Unable to determine branch: %r", ex.output)
         raise GitImportErrorBadRepo()
