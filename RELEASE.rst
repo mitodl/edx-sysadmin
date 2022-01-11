@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.1.6
+Version 0.1.6 (Released January 11, 2022)
 -------------
 
 - add tests
