@@ -53,7 +53,10 @@ class GitReloadAPIView(APIView):
                 err_msg = _("Couldn't find Repo's ssh_url in the payload")
             elif not pushed_branch:
                 err_msg = _("Couldn't find Repo's pushed branch ref in the payload")
-            elif not hasattr(settings, "SYSADMIN_DEFAULT_BRANCH"):
+            elif (
+                not hasattr(settings, "SYSADMIN_DEFAULT_BRANCH")
+                or settings.SYSADMIN_DEFAULT_BRANCH is None
+            ):
                 err_msg = _("SYSADMIN_DEFAULT_BRANCH is not configured in settings")
             elif clean_pushed_branch != settings.SYSADMIN_DEFAULT_BRANCH:
                 err_msg = _(
