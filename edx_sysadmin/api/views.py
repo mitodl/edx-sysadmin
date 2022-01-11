@@ -19,7 +19,7 @@ from edx_sysadmin.git_import import (
 from edx_sysadmin.utils.utils import (
     get_local_active_branch,
     get_local_course_repo,
-    get_clean_branch_name
+    get_clean_branch_name,
 )
 
 logger = logging.getLogger(__name__)
@@ -57,16 +57,17 @@ class GitReloadAPIView(APIView):
                 err_msg = _("SYSADMIN_DEFAULT_BRANCH is not configured in settings")
             elif clean_pushed_branch != settings.SYSADMIN_DEFAULT_BRANCH:
                 err_msg = _(
-                    "Couldn't entertain reload request for the branch ({}), expected branch is ({}) ").format(
-                    clean_pushed_branch, settings.SYSADMIN_DEFAULT_BRANCH
-                )
+                    "Couldn't entertain reload request for the branch ({}), expected branch is ({}) "
+                ).format(clean_pushed_branch, settings.SYSADMIN_DEFAULT_BRANCH)
             else:
                 repo = get_local_course_repo(repo_name)
                 if not repo:
                     # New course reload trigger received from a repo but we don't have it's local copy.
                     # So, We will do the course import instead of reload
 
-                    add_repo.delay(repo=repo_ssh_url, branch=settings.SYSADMIN_DEFAULT_BRANCH)
+                    add_repo.delay(
+                        repo=repo_ssh_url, branch=settings.SYSADMIN_DEFAULT_BRANCH
+                    )
                     msg = _(
                         "No local course copy found. Triggered course import from branch: {} of repo: {}"
                     ).format(settings.SYSADMIN_DEFAULT_BRANCH, repo_name)

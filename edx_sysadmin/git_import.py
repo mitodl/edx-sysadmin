@@ -21,7 +21,10 @@ from six import StringIO
 from xmodule.util.sandboxing import DEFAULT_PYTHON_LIB_FILENAME
 
 from edx_sysadmin.models import CourseGitLog
-from edx_sysadmin.utils.utils import remove_old_course_import_logs, DEFAULT_GIT_REPO_PREFIX
+from edx_sysadmin.utils.utils import (
+    remove_old_course_import_logs,
+    DEFAULT_GIT_REPO_PREFIX,
+)
 
 
 log = logging.getLogger(__name__)

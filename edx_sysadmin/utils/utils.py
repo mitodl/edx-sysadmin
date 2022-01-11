@@ -420,8 +420,8 @@ def remove_old_course_import_logs(course_id):
         deletion_count, _ = CourseGitLog.objects.filter(
             id__in=list(
                 CourseGitLog.objects.filter(course_id=course_id)
-                    .order_by("-created")
-                    .values_list("id", flat=True)[threshold:]
+                .order_by("-created")
+                .values_list("id", flat=True)[threshold:]
             )
         ).delete()
 
