@@ -1,6 +1,16 @@
 Release Notes
 =============
 
+Version 0.1.6
+-------------
+
+- add tests
+- standerdize the configs
+- docs: update the readme with configurations
+- fmt: fmt with black
+- configuration based git import for branch
+- fix: import course if no local copy available
+
 Version 0.1.5 (Released December 17, 2021)
 -------------
 
