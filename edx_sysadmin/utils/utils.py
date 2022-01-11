@@ -33,6 +33,8 @@ from edx_sysadmin.utils.markup import HTML, Text
 User = get_user_model()
 logger = logging.getLogger(__name__)
 
+DEFAULT_GIT_REPO_PREFIX = "refs/heads/"
+
 
 def get_course_by_id(course_key, depth=0):
     """
@@ -448,7 +450,7 @@ def get_local_course_repo(repo_name):
 def get_local_active_branch(repo):
     """
     Get active branch of a git repo
-    :param repo (git.Repo object): course repo
+    :params repo (git.Repo object): course repo
     :return str: active branch name of repo else None
     """
     try:
@@ -457,3 +459,13 @@ def get_local_active_branch(repo):
     except TypeError:
         logger.exception("Unable to get current branch of checked out repo")
         return None
+
+
+def get_clean_branch_name(branch_name):
+    """
+    Get a clean branch name from pushed branch of a webhook payload
+    :params branch_name (str): Branch name with format `refs/heads/<branch_name>`
+    :return str: Clean branch name without `refs/heads/<branch_name>`
+    """
+
+    return branch_name.replace(DEFAULT_GIT_REPO_PREFIX, "")

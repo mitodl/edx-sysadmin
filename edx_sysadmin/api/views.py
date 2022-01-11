@@ -12,12 +12,15 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from edx_sysadmin.api.permissions import GithubWebhookPermission
-from edx_sysadmin.git_import import add_repo, DEFAULT_GIT_REPO_DIR
+from edx_sysadmin.git_import import (
+    add_repo,
+    DEFAULT_GIT_REPO_DIR,
+)
 from edx_sysadmin.utils.utils import (
     get_local_active_branch,
     get_local_course_repo,
+    get_clean_branch_name,
 )
-
 
 logger = logging.getLogger(__name__)
 
@@ -37,9 +40,10 @@ class GitReloadAPIView(APIView):
         try:
             event = request.headers.get("X-Github-Event")
             payload = json.loads(request.body)
-            repo_ssh_url = payload["repository"]["ssh_url"]
-            repo_name = payload["repository"]["name"]
+            repo_ssh_url = payload["repository"].get("ssh_url")
+            repo_name = payload["repository"].get("name")
             pushed_branch = payload.get("ref", "")
+            clean_pushed_branch = get_clean_branch_name(pushed_branch)
 
             if not event == "push":
                 err_msg = _("The API works for 'Push' events only")
@@ -49,11 +53,34 @@ class GitReloadAPIView(APIView):
                 err_msg = _("Couldn't find Repo's ssh_url in the payload")
             elif not pushed_branch:
                 err_msg = _("Couldn't find Repo's pushed branch ref in the payload")
+            elif (
+                not hasattr(settings, "SYSADMIN_DEFAULT_BRANCH")
+                or settings.SYSADMIN_DEFAULT_BRANCH is None
+            ):
+                err_msg = _("SYSADMIN_DEFAULT_BRANCH is not configured in settings")
+            elif clean_pushed_branch != settings.SYSADMIN_DEFAULT_BRANCH:
+                err_msg = _(
+                    "Couldn't entertain reload request for the branch ({}), expected branch is ({}) "
+                ).format(clean_pushed_branch, settings.SYSADMIN_DEFAULT_BRANCH)
             else:
                 repo = get_local_course_repo(repo_name)
                 if not repo:
-                    err_msg = _("The course repo ({}) is not in use").format(repo_name)
+                    # New course reload trigger received from a repo but we don't have it's local copy.
+                    # So, We will do the course import instead of reload
+
+                    add_repo.delay(
+                        repo=repo_ssh_url, branch=settings.SYSADMIN_DEFAULT_BRANCH
+                    )
+                    msg = _(
+                        "No local course copy found. Triggered course import from branch: {} of repo: {}"
+                    ).format(settings.SYSADMIN_DEFAULT_BRANCH, repo_name)
+                    return self.get_reload_response(
+                        msg=msg, status_code=status.HTTP_200_OK
+                    )
+
                 else:
+                    # We have an existing local copy of the course, so we will reload the course after making sure that
+                    # the reload trigger is from the same branch that was used to import the course initially
                     active_branch = get_local_active_branch(repo)
                     if not active_branch or not active_branch == pushed_branch:
                         err_msg = _(
@@ -64,19 +91,26 @@ class GitReloadAPIView(APIView):
                         msg = _("Triggered reloading branch: {} of repo: {}").format(
                             active_branch, repo_name
                         )
-                        logger.info(f"{self.__class__.__name__}:: {msg}")
-                        return Response(
-                            {"message": msg},
-                            status=status.HTTP_200_OK,
+                        return self.get_reload_response(
+                            msg=msg, status_code=status.HTTP_200_OK
                         )
 
         except Exception as e:
             err_msg = str(e)
 
-        logger.exception(f"{self.__class__.__name__}:: {err_msg}")
+        return self.get_reload_response(
+            msg=err_msg, status_code=status.HTTP_400_BAD_REQUEST
+        )
+
+    def get_reload_response(self, msg, status_code):
+        if status_code == status.HTTP_200_OK:
+            logger.info(f"{self.__class__.__name__}:: {msg}")
+        else:
+            logger.exception(f"{self.__class__.__name__}:: {msg}")
+
         return Response(
-            {"message": err_msg},
-            status=status.HTTP_400_BAD_REQUEST,
+            {"message": msg},
+            status=status_code,
         )
 
 

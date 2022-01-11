@@ -39,7 +39,10 @@ class GithubWebhookPermission(permissions.BasePermission):
             :returns boolean: True if HMAC matches else False
             :returns str: Error messages
             """
-            if not hasattr(settings, "SYSADMIN_GITHUB_WEBHOOK_KEY"):
+            if (
+                not hasattr(settings, "SYSADMIN_GITHUB_WEBHOOK_KEY")
+                or settings.SYSADMIN_GITHUB_WEBHOOK_KEY is None
+            ):
                 return (
                     False,
                     _("SYSADMIN_GITHUB_WEBHOOK_KEY is not configured in settings"),
