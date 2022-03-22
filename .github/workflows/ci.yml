@@ -26,9 +26,7 @@ jobs:
           sed -i 's/:cached//g' ./docker-compose-host.yml
           make dev.clone.https
           cd ../edx-platform
-          git remote add mitodl https://github.com/mitodl/edx-platform.git
-          git fetch mitodl
-          git checkout mitodl/arslan/fix-pipeline-import
+          git checkout master
 
       - name: Run tests
         run: |
