@@ -90,7 +90,9 @@ setup(
         "lms.djangoapp": [
             "edx_sysadmin = edx_sysadmin.apps:EdxSysAdminConfig",
         ],
-        "cms.djangoapp": [],
+        "cms.djangoapp": [
+            "edx_sysadmin = edx_sysadmin.apps:EdxSysAdminConfig",
+        ],
     },
 )
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"

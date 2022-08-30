@@ -17,11 +17,18 @@ class EdxSysAdminConfig(AppConfig):
             "lms.djangoapp": {
                 "namespace": "sysadmin",
                 "regex": "^sysadmin/",
-            }
+            },
+            "cms.djangoapp": {
+                "namespace": "sysadmin",
+                "regex": "^sysadmin/",
+            },
         },
         "settings_config": {
             "lms.djangoapp": {
                 "common": {"relative_path": "settings.common"},
-            }
+            },
+            "cms.djangoapp": {
+                "common": {"relative_path": "settings.common"},
+            },
         },
     }

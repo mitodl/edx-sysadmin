@@ -18,7 +18,9 @@ from django.utils.translation import gettext_lazy as _
 from opaque_keys.edx.locator import CourseLocator
 from six import StringIO
 
+from cms.djangoapps.contentstore.outlines import update_outline_from_modulestore
 from xmodule.util.sandboxing import DEFAULT_PYTHON_LIB_FILENAME
+from xmodule.modulestore.django import SignalHandler
 
 from edx_sysadmin.models import CourseGitLog
 from edx_sysadmin.utils.utils import (
@@ -366,6 +368,10 @@ def add_repo(repo, rdir_in=None, branch=None):
         # We want set course id in CourseGitLog as CourseLocator. So that in split module
         # environment course id remain consistent as CourseLocator instance.
         course_key = CourseLocator(*course_id)
+        update_outline_from_modulestore(course_key)
+        SignalHandler.course_published.send(
+            sender=course_key.course, course_key=course_key
+        )
         cdir = "{0}/{1}".format(git_repo_dir, course_key.course)
         log.debug("Studio course dir = %s", cdir)
 
