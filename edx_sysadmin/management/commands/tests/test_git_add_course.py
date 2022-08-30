@@ -191,7 +191,9 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
         self.assertIsNone(self.store.get_course(self.TEST_BRANCH_COURSE))
         git_import.add_repo(self.TEST_REPO, repo_dir / "edx4edx_lite", "master")
         self.assertIsNone(self.store.get_course(self.TEST_BRANCH_COURSE))
-        self.assertIsNotNone(self.store.get_course(CourseKey.from_string(self.TEST_COURSE)))
+        self.assertIsNotNone(
+            self.store.get_course(CourseKey.from_string(self.TEST_COURSE))
+        )
 
     def test_branch_exceptions(self):
         """
