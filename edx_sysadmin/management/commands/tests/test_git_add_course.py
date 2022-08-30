@@ -179,20 +179,19 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
 
         # Checkout new branch
         git_import.add_repo(self.TEST_REPO, repo_dir / "edx4edx_lite", self.TEST_BRANCH)
-        def_ms = modulestore()
         # Validate that it is different than master
-        self.assertIsNotNone(def_ms.get_course(self.TEST_BRANCH_COURSE))
+        self.assertIsNotNone(self.store.get_course(self.TEST_BRANCH_COURSE))
 
         # Attempt to check out the same branch again to validate branch choosing
         # works
         git_import.add_repo(self.TEST_REPO, repo_dir / "edx4edx_lite", self.TEST_BRANCH)
 
         # Delete to test branching back to master
-        def_ms.delete_course(self.TEST_BRANCH_COURSE, ModuleStoreEnum.UserID.test)
-        self.assertIsNone(def_ms.get_course(self.TEST_BRANCH_COURSE))
+        self.store.delete_course(self.TEST_BRANCH_COURSE, ModuleStoreEnum.UserID.test)
+        self.assertIsNone(self.store.get_course(self.TEST_BRANCH_COURSE))
         git_import.add_repo(self.TEST_REPO, repo_dir / "edx4edx_lite", "master")
-        self.assertIsNone(def_ms.get_course(self.TEST_BRANCH_COURSE))
-        self.assertIsNotNone(def_ms.get_course(CourseKey.from_string(self.TEST_COURSE)))
+        self.assertIsNone(self.store.get_course(self.TEST_BRANCH_COURSE))
+        self.assertIsNotNone(self.store.get_course(CourseKey.from_string(self.TEST_COURSE)))
 
     def test_branch_exceptions(self):
         """
