@@ -413,4 +413,4 @@ def add_repo(repo, rdir_in=None, branch=None):
 
     removed_logs_count = remove_old_course_import_logs(course_key)
     if removed_logs_count > 0:
-        log.debug(f"removed {removed_logs_count} old CourseGitLog for {course_key}")
+        log.debug(f"Removed {removed_logs_count} old CourseGitLog for {course_key}")
