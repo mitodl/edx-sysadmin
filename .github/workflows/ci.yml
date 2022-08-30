@@ -28,7 +28,7 @@ jobs:
           cd ../edx-platform
           git remote add mitodl https://github.com/mitodl/edx-platform.git
           git fetch mitodl
-          git checkout mitodl/arslan/fix-pipeline-import
+          git checkout mitodl/master
 
       - name: Run tests
         run: |
