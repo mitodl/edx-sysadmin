@@ -1,6 +1,7 @@
 """
 Utility function defined here.
 """
+# pylint: disable=wrong-import-order
 import json
 import logging
 import os
