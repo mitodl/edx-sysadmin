@@ -3,10 +3,13 @@ Utility function defined here.
 """
 import json
 import logging
-import urllib.parse
 import os
-import requests
+import urllib.parse
 
+import requests
+from common.djangoapps.student.models import UserProfile
+from common.djangoapps.student.roles import CourseInstructorRole
+from common.djangoapps.util.password_policy_validators import normalize_password
 from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -14,21 +17,12 @@ from django.http import Http404
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from django_countries import countries
-from git import Repo, InvalidGitRepositoryError, NoSuchPathError
-
-from common.djangoapps.student.models import UserProfile
-from common.djangoapps.student.roles import (
-    CourseInstructorRole,
-)
-from common.djangoapps.util.password_policy_validators import normalize_password
-from openedx.core.djangoapps.user_authn.toggles import (
-    is_require_third_party_auth_enabled,
-)
+from git import InvalidGitRepositoryError, NoSuchPathError, Repo
+from openedx.core.djangoapps.user_authn.toggles import is_require_third_party_auth_enabled
 from xmodule.modulestore.django import modulestore
 
 from edx_sysadmin.models import CourseGitLog
 from edx_sysadmin.utils.markup import HTML, Text
-
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
