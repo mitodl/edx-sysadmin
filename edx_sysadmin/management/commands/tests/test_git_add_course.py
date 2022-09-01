@@ -7,14 +7,12 @@ import shutil
 import subprocess
 from uuid import uuid4
 
+import six
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test.utils import override_settings
-from opaque_keys.edx.keys import CourseKey
-import six
 from six import StringIO
-
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -38,16 +36,17 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
     Tests the git_add_course management command for proper functions.
     """
 
-    TEST_REPO = "https://github.com/edx/edx4edx_lite.git"
-    TEST_COURSE = "MITx/edx4edx/edx4edx"
-    TEST_BRANCH = "testing_do_not_delete"
-    TEST_BRANCH_COURSE = CourseKey.from_string("MITx/edx4edx_branch/edx4edx")
-
     ENABLED_CACHES = ["default", "mongo_metadata_inheritance", "loc_cache"]
 
     def setUp(self):
         super().setUp()
         self.git_repo_dir = settings.GIT_REPO_DIR
+        self.TEST_REPO = "https://github.com/edx/edx4edx_lite.git"
+        self.TEST_COURSE = self.store.make_course_key("MITx", "edx4edx", "edx4edx")
+        self.TEST_BRANCH = "testing_do_not_delete"
+        self.TEST_BRANCH_COURSE = self.store.make_course_key(
+            "MITx", "edx4edx_branch", "edx4edx"
+        )
 
     def assertCommandFailureRegexp(self, regex, *args):
         """
@@ -192,7 +191,7 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
         self.assertIsNone(def_ms.get_course(self.TEST_BRANCH_COURSE))
         git_import.add_repo(self.TEST_REPO, repo_dir / "edx4edx_lite", "master")
         self.assertIsNone(def_ms.get_course(self.TEST_BRANCH_COURSE))
-        self.assertIsNotNone(def_ms.get_course(CourseKey.from_string(self.TEST_COURSE)))
+        self.assertIsNotNone(def_ms.get_course(self.TEST_COURSE))
 
     def test_branch_exceptions(self):
         """
