@@ -22,7 +22,10 @@ from xmodule.modulestore.django import SignalHandler
 from xmodule.util.sandboxing import DEFAULT_PYTHON_LIB_FILENAME
 
 from edx_sysadmin.models import CourseGitLog
-from edx_sysadmin.utils.utils import DEFAULT_GIT_REPO_PREFIX, remove_old_course_import_logs
+from edx_sysadmin.utils.utils import (
+    DEFAULT_GIT_REPO_PREFIX,
+    remove_old_course_import_logs,
+)
 
 log = logging.getLogger(__name__)
 

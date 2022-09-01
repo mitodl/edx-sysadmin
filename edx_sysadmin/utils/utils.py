@@ -18,7 +18,9 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 from django_countries import countries
 from git import InvalidGitRepositoryError, NoSuchPathError, Repo
-from openedx.core.djangoapps.user_authn.toggles import is_require_third_party_auth_enabled
+from openedx.core.djangoapps.user_authn.toggles import (
+    is_require_third_party_auth_enabled,
+)
 from xmodule.modulestore.django import modulestore
 
 from edx_sysadmin.models import CourseGitLog
