@@ -2,30 +2,30 @@
 Provides a function for importing a git repository into the lms
 instance when using a mongo modulestore
 """
-
+# pylint: disable=wrong-import-order
 
 import logging
 import os
 import re
 import subprocess
+from io import StringIO
 
 from celery import shared_task
+from cms.djangoapps.contentstore.outlines import update_outline_from_modulestore
 from django.conf import settings
 from django.core import management
 from django.core.management.base import CommandError
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from opaque_keys.edx.locator import CourseLocator
-from six import StringIO
-
+from xmodule.modulestore.django import SignalHandler
 from xmodule.util.sandboxing import DEFAULT_PYTHON_LIB_FILENAME
 
 from edx_sysadmin.models import CourseGitLog
 from edx_sysadmin.utils.utils import (
-    remove_old_course_import_logs,
     DEFAULT_GIT_REPO_PREFIX,
+    remove_old_course_import_logs,
 )
-
 
 log = logging.getLogger(__name__)
 
@@ -366,6 +366,10 @@ def add_repo(repo, rdir_in=None, branch=None):
         # We want set course id in CourseGitLog as CourseLocator. So that in split module
         # environment course id remain consistent as CourseLocator instance.
         course_key = CourseLocator(*course_id)
+        update_outline_from_modulestore(course_key)
+        SignalHandler.course_published.send(
+            sender=course_key.course, course_key=course_key
+        )
         cdir = "{0}/{1}".format(git_repo_dir, course_key.course)
         log.debug("Studio course dir = %s", cdir)
 
