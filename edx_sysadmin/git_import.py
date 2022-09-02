@@ -8,6 +8,7 @@ import logging
 import os
 import re
 import subprocess
+from io import StringIO
 
 from celery import shared_task
 from cms.djangoapps.contentstore.outlines import update_outline_from_modulestore
@@ -17,7 +18,6 @@ from django.core.management.base import CommandError
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from opaque_keys.edx.locator import CourseLocator
-from six import StringIO
 from xmodule.modulestore.django import SignalHandler
 from xmodule.util.sandboxing import DEFAULT_PYTHON_LIB_FILENAME
 

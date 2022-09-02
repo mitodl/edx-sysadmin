@@ -6,14 +6,13 @@ import logging
 import os
 import shutil
 import subprocess
+from io import StringIO
 from uuid import uuid4
 
-import six
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test.utils import override_settings
-from six import StringIO
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -43,9 +42,9 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
         super().setUp()
         self.git_repo_dir = settings.GIT_REPO_DIR
         self.TEST_REPO = "https://github.com/edx/edx4edx_lite.git"
-        self.TEST_COURSE = self.store.make_course_key("MITx", "edx4edx", "edx4edx")
+        self.TEST_COURSE_KEY = self.store.make_course_key("MITx", "edx4edx", "edx4edx")
         self.TEST_BRANCH = "testing_do_not_delete"
-        self.TEST_BRANCH_COURSE = self.store.make_course_key(
+        self.TEST_BRANCH_COURSE_KEY = self.store.make_course_key(
             "MITx", "edx4edx_branch", "edx4edx"
         )
 
@@ -61,12 +60,9 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
         Validate argument checking
         """
         # No argument given.
-        if six.PY2:
-            self.assertCommandFailureRegexp("Error: too few arguments")
-        else:
-            self.assertCommandFailureRegexp(
-                "Error: the following arguments are required: repository_url"
-            )
+        self.assertCommandFailureRegexp(
+            "Error: the following arguments are required: repository_url"
+        )
         # Extra/Un-named arguments given.
         self.assertCommandFailureRegexp(
             "Error: unrecognized arguments: blah blah blah",
@@ -181,18 +177,18 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
         git_import.add_repo(self.TEST_REPO, repo_dir / "edx4edx_lite", self.TEST_BRANCH)
         def_ms = modulestore()
         # Validate that it is different than master
-        self.assertIsNotNone(def_ms.get_course(self.TEST_BRANCH_COURSE))
+        self.assertIsNotNone(def_ms.get_course(self.TEST_BRANCH_COURSE_KEY))
 
         # Attempt to check out the same branch again to validate branch choosing
         # works
         git_import.add_repo(self.TEST_REPO, repo_dir / "edx4edx_lite", self.TEST_BRANCH)
 
         # Delete to test branching back to master
-        def_ms.delete_course(self.TEST_BRANCH_COURSE, ModuleStoreEnum.UserID.test)
-        self.assertIsNone(def_ms.get_course(self.TEST_BRANCH_COURSE))
+        def_ms.delete_course(self.TEST_BRANCH_COURSE_KEY, ModuleStoreEnum.UserID.test)
+        self.assertIsNone(def_ms.get_course(self.TEST_BRANCH_COURSE_KEY))
         git_import.add_repo(self.TEST_REPO, repo_dir / "edx4edx_lite", "master")
-        self.assertIsNone(def_ms.get_course(self.TEST_BRANCH_COURSE))
-        self.assertIsNotNone(def_ms.get_course(self.TEST_COURSE))
+        self.assertIsNone(def_ms.get_course(self.TEST_BRANCH_COURSE_KEY))
+        self.assertIsNotNone(def_ms.get_course(self.TEST_COURSE_KEY))
 
     def test_branch_exceptions(self):
         """
