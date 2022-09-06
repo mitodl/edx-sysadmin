@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.2.0
+Version 0.2.0 (Released September 06, 2022)
 -------------
 
 - Sysadmin-71 Creates course outline and sends course published signal (#72)
