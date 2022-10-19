@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.2.1
+Version 0.2.1 (Released October 19, 2022)
 -------------
 
 - version: Update version locks
