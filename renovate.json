@@ -1,15 +1,20 @@
 {
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    ":automergeMinor",
-    ":rebaseStalePrs",
-    ":separateMajorReleases",
-    "config:base"
+    "local>mitodl/.github:renovate-config"
   ],
-  "schedule": [
-    "every weekend"
-  ],
-  "timezone": "US/Eastern",
-  "lockFileMaintenance": {
-    "enabled": true
-  }
+    "packageRules": [
+    {
+      "groupName": "all non-major dev-dependencies",
+      "groupSlug": "all-minor-dev-patch",
+      "matchPackagePatterns": [
+        "*"
+      ],
+      "matchPaths": ["test*requirement*.txt", "dev*requirement*.txt", "tst*require*.txt"],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ]
+    }
+  ]
 }
