@@ -215,8 +215,8 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         date = CourseGitLog.objects.all().first().created.replace(tzinfo=UTC)
 
         for timezone in tz_names:
-            with (
-                override_settings(TIME_ZONE=timezone)
+            with override_settings(
+                TIME_ZONE=timezone
             ):  # lint-amnesty, pylint: disable=superfluous-parens
                 date_text = get_time_display(date, tz_format, settings.TIME_ZONE)
                 response = self.client.get(reverse("sysadmin:gitlogs"))
