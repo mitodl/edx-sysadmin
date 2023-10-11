@@ -1,7 +1,13 @@
+⛔️ DEPRECATION WARNING
+======================
+This repository is deprecated. Please see `open-edx-plugins <https://github.com/mitodl/open-edx-plugins>`__ for all the future updates and development.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
 edx-sysadmin
 =============================
 
-This is a django app plugin extracted from `edx-platform <https://github.com/edx/edx-platform>`_ which enables certian users to perform some specific operations in Open edX environment (which are described under ``Features`` section below).
+This is a django app plugin extracted from `edx-platform <https://github.com/edx/edx-platform>`_ which enables certain users to perform some specific operations in Open edX environment (which are described under ``Features`` section below).
 Earlier, ``Sysadmin Dashboard`` was a part of ``edx-platform``, however starting from `lilac release <https://github.com/edx/edx-platform/tree/open-release/lilac.master>`_ of Open edX the sysadmin panel has been removed
 and transitioned to as separate plugin.
 
@@ -77,7 +83,7 @@ After installation the plugin should be directly getting served through your edx
 Testing
 ~~~~~~~
 
-edx-sysadmin tests are dependednt on edx-platform that's why they can only be run from inside of lms shell
+edx-sysadmin tests are dependent on edx-platform that's why they can only be run from inside of lms shell
 
 .. code-block::
 
