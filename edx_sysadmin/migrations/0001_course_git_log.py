@@ -7,7 +7,6 @@ import opaque_keys.edx.django.models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = []
